@@ -1,0 +1,199 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      type:
+        type: choice
+        required: true
+        description: Pre-release type
+        options:
+          - alpha
+          - beta
+          - rc
+          - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  discussions: write
+  packages: write
+  pages: write
+  # This is used to complete the identity challenge
+  # with sigstore/fulcio when running outside of PRs.
+  id-token: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    name: Bump version and create changelog with commitizen
+    steps:
+      - uses: actions/checkout@v3
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+      - id: cz-prerelease
+        name: Create bump and changelog (prerelease)
+        if: ${{ github.event.inputs.type }} == 'main'
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gpg_sign: true
+      - id: cz-prerelease
+        name: Create bump and changelog (prerelease)
+        if: github.event.inputs.type != 'main'
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gpg_sign: true
+          prerelease: ${{ github.event.inputs.type }}
+      - name: Print Version
+        run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
+
+  github-publish:
+    needs: [bump]
+    runs-on: ${{ os }}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - name: Get release notes
+        id: release-notes
+        run: echo "release_notes=$(cz changelog --dry-run ${{ github.ref }})" >> $GITHUB_OUTPUT
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          draft: false
+          generate_release_notes: false
+          body: ${{ steps.release-notes.outputs.release_notes }}
+          fail_on_unmatched_files: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: dist/*
+
+  pypi-publish:
+    needs: [bump]
+    runs-on: ${{ os }}
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+      - name: Install hatch
+        run: pip install hatch~=1.7
+      - name: Publish to PyPi
+        run: hatch publish
+        env:
+          HATCH_INDEX_USER: __token__
+          HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
+        if: ${{ env.pypi_token != '' }}
+
+  docker-publish:
+    needs: [bump]
+    runs-on: ${{ os }}
+    steps:
+      # https://github.com/sigstore/cosign-installer
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.1.1
+      - name: Download Docker image
+        uses: actions/download-artifact@v3
+        with:
+          name: docker
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ GITHUB_REPOSITORY }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        env:
+          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+        with:
+          username: ${{ env.dockerhub_username }}
+          password: ${{ env.dockerhub_token }}
+        if: ${{ env.dockerhub_username != '' }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v2
+        env:
+          ghcr_username: ${{ github.actor }}
+          ghcr_password: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          registry: ghcr.io
+      - name: Push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      # Sign the resulting Docker image digest except on PRs.
+      # This will only write to the public Rekor transparency log when the Docker
+      # repository is public to avoid leaking data.  If you would like to publish
+      # transparency data even for private images, pass --force to cosign below.
+      # https://github.com/sigstore/cosign
+      - name: Sign the published Docker image
+        if: ${{ github.event_name != 'pull_request' }}
+        env:
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
+          TAGS: ${{ steps.meta.outputs.tags }}
+          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+  pages:
+    name: Pages
+    runs-on: ubuntu-latest
+    needs: [bump]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0 # Fetch all history for .GitInfo and .Lastmod
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: "0.116.0"
+      - name: Build
+        run: hugo --minify
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/public
+          # Write .nojekyll at the root, see:
+          # https://help.github.com/en/github/working-with-github-pages/about-github-pages#static-site-generators
+          enable_jekyll: false
+
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [pypi-publish, docker-publish, pages]
+    if: ${{ !cancelled() && SLACK_WEBHOOK != '' }}
+    steps:
+      - name: Send Slack notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job_status }}
+          SLACK_LINK_NAMES: true
+          MSG_MINIMAL: true

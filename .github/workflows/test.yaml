@@ -1,0 +1,89 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+name: Test
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  statuses: read
+  actions: read
+  security-events: write
+
+jobs:
+  test-matrix:
+    name: Test matrix
+    strategy:
+      matrix:
+        os: ["ubuntu-latest", "windows-latest", "macos-latest"]
+        # :tyranno: python: ${tool.hatch.envs.all.matrix.python~[0]~}
+        python: ["3.11", "3.12-dev"]
+    uses: ./.github/workflows/test-one.yaml
+    with:
+      os: ${{ matrix.os }}
+      python: ${{ matrix.python }}
+    secrets: inherit
+
+  test-docker:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: "docker build on ${{ matrix.os }}"
+        run: docker build .
+
+  codeql:
+    name: Analyze with CodeQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+      - name: Autobuild with CodeQL
+        uses: github/codeql-action/autobuild@v2
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{matrix.language}}"
+
+  ruff:
+    name: Run Bandit with Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install Ruff
+        run: pip install 'ruff>=0.0.280,<1.0'
+      - name: Run Ruff
+        run: ruff --select S .
+
+  docs:
+    name: Build docs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          pip install hatch
+          hatch run docs

@@ -1,0 +1,79 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+name: Pull
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+    branches:
+      - main
+      - "releases/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  statuses: write
+  pull-requests: write
+
+jobs:
+  check-title:
+    name: Validate PR title
+    if: ${{ github.base_ref != '' || github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: hmarr/debug-action@v2
+      - id: check-semantic-pr-title
+        uses: amannn/action-semantic-pull-request@v5
+        with:
+          types: |
+            security
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: marocchino/sticky-pull-request-comment@v2
+        name: Post Comment, Output on Pull Request
+        if: ${{ !cancelled() && steps.check-semantic-pr-title.outputs.error_message != null }}
+        with:
+          header: semantic-pull-request-error
+          message: |
+            Please edit your pull request title to follow the
+            [Conventional Commits specification](https://www.conventionalcommits.org).
+
+            Details:
+
+            ```
+            ${{ steps.check-semantic-pr-title.outputs.error_message }}
+            ```
+      - uses: marocchino/sticky-pull-request-comment@v2
+        name: Delete pull request lint comment
+        if: ${{ steps.semantic_pr_title.outputs.error_message == null }}
+        with:
+          header: semantic-pull-request-error
+          delete: true
+      - name: Read config file
+        id: get-types-to-labels
+        run: echo "config=$(cat .github/types-to-labels.json)" >> $GITHUB_OUTPUT
+      - name: Label pull request
+        uses: bcoe/conventional-release-labels@v1
+        with:
+          type_labels: ${{ steps.get-types-to-labels.outputs.config }}
+
+  test:
+    name: Test
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+    if: ${{ !github.event.pull_request.draft }}

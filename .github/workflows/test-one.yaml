@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+name: Test one
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        required: true
+        type: string
+      python:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  statuses: read
+
+jobs:
+  test:
+    name: Run tests for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
+    runs-on: "${{ github.event.inputs.os }}"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "${{ github.event.inputs.python }}"
+      - name: Install on ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
+        run: pip install .[test]
+      - name: Test on ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
+        run: pytest tests/
+      - name: Upload wheels for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ github.event.inputs.os }}-${{ github.event.inputs.python }}
+          path: dist/*
+      - name: Upload coverage for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-${{ github.event.inputs.os }}-${{ github.event.inputs.python }}
+          path: .coverage
