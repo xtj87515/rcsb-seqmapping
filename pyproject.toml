@@ -78,7 +78,8 @@ dependencies = [
   "mypy                 ~=1.4",
   "ruff                 >=0.0.280",
   "mkdocs               ~=1.5",
-  "mkdocs-material      ~=9",
+  "mike                 ~=1.2",
+  "mkdocs-material      ~=9.1",
   "mkdocs-minify-plugin ~=0.7",
   "mkdocstrings[python] >=0.20",
 ]
@@ -278,19 +279,32 @@ add-defaults = true
 add          = []
 exclude      = []
 
+#===== Tyranno sync from web =====#
+[tool.tyranno.web]
+uris = [
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.gitignore",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.dockerignore",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.editorconfig",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.gitattributes",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.prettierignore",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.scrutinizer.yaml",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.pre-commit-config.yaml",
+  "https://github.com/dmyersturnbull/suretime/blob/main/.github/dependabot.yaml",
+  "https://github.com/dmyersturnbull/suretime/tree/main/.github/workflows/",
+  "https://github.com/dmyersturnbull/suretime/tree/main/.github/DISCUSSION_TEMPLATE/",
+  "https://github.com/dmyersturnbull/suretime/tree/main/.github/ISSUE_TEMPLATE/",
+  "https://github.com/dmyersturnbull/suretime/tree/main/.github/PULL_REQUEST_TEMPLATE/",
+]
+
+#[[tool.tyranno.web.manual]]
+#path = ""
+#uri = ""
+
 #===== Tyranno auto-add SPDX headers =====#
-[tool.tyranno.auto-sync.headers]
+[tool.tyranno.headers]
 text = "${.header}"
 add = ["**/*"]
 exclude = []
-
-#===== Tyranno auto-sync licenses =====#
-[tool.tyranno.auto-sync.license]
-# sync the main license
-main-license-file = "LICENSE.txt"
-license-files = "./LICENSE-{{ID}}.txt"
-# require that all SPDX IDs are mentioned:
-notice-file = "NOTICE.txt"
 
 #===== Tyranno 'clean' command =====#
 [tool.tyranno.trash]

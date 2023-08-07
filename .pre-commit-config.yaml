@@ -29,7 +29,7 @@ repos:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.5.2
+    rev: v3.6.0
 
   # --- Linters ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
