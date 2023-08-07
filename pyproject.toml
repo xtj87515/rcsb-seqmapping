@@ -69,26 +69,27 @@ Changelog = "https://github.com/dmyersturnbull/cicd/blob/main/CHANGELOG.md"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "pre-commit         ~=3.3",
-  "bandit             ~=1.7",
-  "hypothesis         ~=6.0",
-  "pytest             ~=7.0",
-  "coverage[toml]     ~=7.0",
-  "pytest-cov         ~=3.0",
-  "mypy               ~=1.4",
-  "ruff               >=0.0.280",
-  "sphinx             ~=7.0",
-  "sphinx-autoapi     ~=2.0",
-  "sphinx-copybutton  >=0.5",
-  "furo               >=2023",
-  "myst-parser        ~=2.0",
-  "sphinx-autodoc2    >=0.4"
+  "pre-commit           ~=3.3",
+  "hypothesis           ~=6.0",
+  "pytest               ~=7.0",
+  "tzdata               >=2023",
+  "coverage[toml]       ~=7.0",
+  "pytest-cov           ~=3.0",
+  "mypy                 ~=1.4",
+  "ruff                 >=0.0.280",
+  "mkdocs               ~=1.5",
+  "mkdocs-material      ~=9",
+  "mkdocs-minify-plugin ~=0.7",
+  "mkdocstrings[python] >=0.20",
 ]
-skip-install = true
+#skip-install = true
 
 [tool.hatch.envs.default.scripts]
 test = [
-  "pytest --cov=cicd tests/",
+  "pytest tests/",
+]
+bandit = [
+  "ruff --select S {args:.}",
 ]
 lint = [
   "ruff {args:.}",
@@ -101,13 +102,12 @@ fmt = [
 clean = [
   "tyranno clean"
 ]
-docs = [
-  "sphinx-build -b html docs docs/html"
+build-docs = [
+  "mkdocs build"
 ]
-
-[[tool.hatch.envs.all.matrix]]
-python = ["3.11"]
-
+serve-docs = [
+  "mkdocs serve"
+]
 
 
 ###################

@@ -70,6 +70,7 @@ eggs/
 sdist/
 
 # Documentation and coverage
+site/
 docs/html/
 docs/_build
 cython_debug/

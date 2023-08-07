@@ -69,13 +69,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: Install Ruff
-        run: pip install 'ruff>=0.0.280,<1.0'
-      - name: Run Ruff
-        run: ruff --select S .
+      - name: Run Bandit
+        run: hatch run bandit
 
   docs:
-    name: Build docs
+    name: Test building docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -86,4 +84,4 @@ jobs:
       - name: Install
         run: |
           pip install hatch
-          hatch run docs
+          hatch run build-docs

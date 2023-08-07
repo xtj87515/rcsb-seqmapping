@@ -64,13 +64,6 @@ jobs:
         with:
           header: semantic-pull-request-error
           delete: true
-      - name: Read config file
-        id: get-types-to-labels
-        run: echo "config=$(cat .github/types-to-labels.json)" >> $GITHUB_OUTPUT
-      - name: Label pull request
-        uses: bcoe/conventional-release-labels@v1
-        with:
-          type_labels: ${{ steps.get-types-to-labels.outputs.config }}
 
   test:
     name: Test
