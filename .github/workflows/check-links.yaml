@@ -2,7 +2,7 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: Check
+name: Check links
 
 on:
   push:

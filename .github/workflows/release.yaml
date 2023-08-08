@@ -2,20 +2,16 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: deploy
+name: Release
 
 on:
   workflow_dispatch:
     inputs:
-      type:
+      release-type:
         type: choice
         required: true
         description: Pre-release type
-        options:
-          - alpha
-          - beta
-          - rc
-          - main
+        options: [alpha, beta, rc, ""]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -23,18 +19,13 @@ concurrency:
 
 permissions:
   contents: write
-  issues: write
-  discussions: write
-  packages: write
-  pages: write
-  # This is used to complete the identity challenge
-  # with sigstore/fulcio when running outside of PRs.
-  id-token: write
 
 jobs:
   bump:
     runs-on: ubuntu-latest
     name: Bump version and create changelog with commitizen
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - name: Import GPG key
@@ -44,31 +35,15 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-      - id: cz-prerelease
-        name: Create bump and changelog (prerelease)
-        if: ${{ github.event.inputs.type }} == 'main'
+      - id: cz-release
+        name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
           gpg_sign: true
-      - id: cz-prerelease
-        name: Create bump and changelog (prerelease)
-        if: github.event.inputs.type != 'main'
-        uses: commitizen-tools/commitizen-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          gpg_sign: true
-          prerelease: ${{ github.event.inputs.type }}
+          prerelease: ${{ github.event.inputs.release-type }}
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
-
-  deploy-packages:
-    needs: [bump]
-    uses: .github/workflows/deploy-packages.yaml
-
-  deploy-docs:
-    needs: [bump]
-    uses: .github/workflows/deploy-docs.yaml
 
   notify:
     name: Notify

@@ -1,0 +1,41 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+name: Deploy docs
+
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: false
+
+permissions:
+  pages: write
+
+jobs:
+  docs-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          depth: 1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: |
+          pip install hatch
+          hatch run deploy-docs ${{ github.ref_name }} --push
+
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site
+          commit_message: ${{ github.event.head_commit.message }}
+          # Write .nojekyll at the root, see:
+          # https://help.github.com/en/github/working-with-github-pages/about-github-pages#static-site-generators
+          enable_jekyll: false
+          # Only deploy if there were changes
+          allow_empty_commit: false

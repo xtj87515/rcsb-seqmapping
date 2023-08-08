@@ -31,11 +31,12 @@ jobs:
         run: |
           pip install hatch
           hatch run test
-      - name: Upload coverage for ${{ matrix.os }}/py${{ matrix.python }}
+      - name: Store coverage for ${{ matrix.os }}/py${{ matrix.python }}
         uses: actions/upload-artifact@v3
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.python }}
           path: .coverage
+          if-no-files-found: error
 
   test-docker:
     strategy:

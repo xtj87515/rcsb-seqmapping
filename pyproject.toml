@@ -86,27 +86,16 @@ dependencies = [
 #skip-install = true
 
 [tool.hatch.envs.default.scripts]
-test = [
-  "pytest --cov --cov-config=pyproject.toml {args:tests/}",
-]
-clean = [
-  "tyranno clean"
-]
-build-docs = [
-  "mkdocs build --clean --strict"
-]
-serve-docs = [
-  "mkdocs serve"
-]
-fmt = [
-  "pre-commit run --all-files"
-]
-bandit = [
-  "ruff --select S {args:.}",
-  #"nbqa ruff --select S {args:.}"  # if using notebooks (also add nbqa to dependencies)
-]
+test = "pytest --cov --cov-config=pyproject.toml {args:tests/}"
+clean = "tyranno clean"
+build-docs = "mkdocs build --clean --strict"
+serve-docs = "mkdocs serve"
+deploy-docs = "mike deploy --config-file mkdocs.yaml {args}"
+obliterate-docs = "mike delete --all"
+fmt = "pre-commit run --all-files"
+bandit = "ruff --select S {args:.}"
 lint = [
-  "pre-commit run --all-files --no-fail-fast",
+  "pre-commit run --all-files",
   "mypy --non-interactive {args:src/cicd tests}"
 ]
 

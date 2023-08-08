@@ -2,20 +2,11 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: deploy-packages
+name: Deploy packages
 
 on:
-  workflow_dispatch:
-    inputs:
-      type:
-        type: choice
-        required: true
-        description: Pre-release type
-        options:
-          - alpha
-          - beta
-          - rc
-          - main
+  push:
+    tags: ["v*"]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -23,10 +14,6 @@ concurrency:
 
 permissions:
   contents: write
-  issues: write
-  discussions: write
-  packages: write
-  pages: write
   # This is used to complete the identity challenge
   # with sigstore/fulcio when running outside of PRs.
   id-token: write
@@ -45,7 +32,7 @@ jobs:
         run: echo "release_notes=$(cz changelog --dry-run ${{ github.ref }})" >> $GITHUB_OUTPUT
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
+        #if: startsWith(github.ref, 'refs/tags/')
         with:
           draft: false
           generate_release_notes: false
@@ -87,7 +74,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
       - name: Extract Docker metadata
-        id: meta
+        id: docker-meta
         uses: docker/metadata-action@v4
         with:
           images: ${{ GITHUB_REPOSITORY }}
@@ -112,8 +99,8 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.docker-meta.outputs.tags }}
+          labels: ${{ steps.docker-meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
       # Sign the resulting Docker image digest except on PRs.
@@ -125,7 +112,7 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         env:
           # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.meta.outputs.tags }}
+          TAGS: ${{ steps.docker-meta.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.

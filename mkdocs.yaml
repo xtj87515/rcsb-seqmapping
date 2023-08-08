@@ -120,6 +120,8 @@ plugins:
         python:
           options:
             show_submodules: true
+  - mike:
+      canonical_version: latest
   - minify:
       minify_html: true
       minify_js: true

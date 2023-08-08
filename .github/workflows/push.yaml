@@ -23,7 +23,7 @@ concurrency:
 jobs:
   test:
     name: Test
-    uses: ./.github/workflows/test.yaml
+    uses: ./.github/workflows/_test.yaml
     secrets: inherit
 
   send-coverage:

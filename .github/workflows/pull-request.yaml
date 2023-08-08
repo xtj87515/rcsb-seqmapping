@@ -2,7 +2,7 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: Pull
+name: Pull request
 
 on:
   pull_request:
@@ -67,6 +67,6 @@ jobs:
 
   test:
     name: Test
-    uses: ./.github/workflows/test.yaml
+    uses: ./.github/workflows/_test.yaml
     secrets: inherit
     if: ${{ !github.event.pull_request.draft }}
