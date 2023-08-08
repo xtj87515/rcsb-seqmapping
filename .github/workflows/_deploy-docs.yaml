@@ -33,14 +33,14 @@ jobs:
           pip install hatch
           hatch run deploy-docs --update-aliases latest --push
       - name: Deploy docs for ${{ github.ref_name }}
-        if: startsWith(github.ref, 'refs/tags/')
+        if: ${{ github.ref_type == 'tag' }}
         run: |
           pip install hatch
           hatch run deploy-docs ${{ github.ref_name }} --push
       - name: Publish GitHub Page
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ github.token }}
           publish_dir: site
           # Write .nojekyll at the root, see:
           # https://help.github.com/en/github/working-with-github-pages/about-github-pages#static-site-generators

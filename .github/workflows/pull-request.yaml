@@ -43,7 +43,7 @@ jobs:
             ci
             chore
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: marocchino/sticky-pull-request-comment@v2
         name: Post Comment, Output on Pull Request
         if: ${{ !cancelled() && steps.check-semantic-pr-title.outputs.error_message != null }}

@@ -16,3 +16,7 @@ def run(path: Path) -> None:
         path: A path to a place
     """
     print(path)
+
+
+def execute(path: Path) -> None:
+    print(path)
