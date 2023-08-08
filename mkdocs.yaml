@@ -2,7 +2,7 @@
 site_name: "CICD"
 
 # :tyranno: site_name: "${.copyright}"
-copyright: Copyright 2023 Contributors to the CICD project
+copyright: Copyright 2023, Contributors to the CICD project
 # :tyranno: site_name: "${project.description}"
 site_description: "CI/CD example"
 
@@ -18,6 +18,8 @@ theme:
   features:
     - tabs
     - content.action.edit
+    - content.code.copy
+    - content.code.annotate
   custom_dir: docs/overrides
   edit_uri: edit/main/docs/
   icon:
@@ -62,25 +64,54 @@ theme:
 markdown_extensions:
   - admonition
   - attr_list
+  - pymdownx.betterem:
+      smart_enable: all
   - codehilite:
       guess_lang: false
   - def_list
   - footnotes
   - meta
-  - toc:
-      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
   - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight:
+      guess_lang: false
+      linenums_style: pymdownx-inline
+      use_pygments: true
+  - pymdownx.inlinehilite
   - pymdownx.mark
-  - pymdownx.tilde
-  - pymdownx.highlight
+  - pymdownx.magiclink:
+      repo_url_shortener: true
+      repo_url_shorthand: true
+      social_url_shortener: true
+      social_url_shorthand: true
+      normalize_issue_symbols: true
+      provider: github
+      # :tyranno: user: ${.vendor}
+      user: dmyersturnbull
+      # :tyranno: repo: ${project.name}
+      repo: cicd
+  - pymdownx.saneheaders
   - pymdownx.smartsymbols
-  - pymdownx.snippets
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
   - smarty
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
 
 plugins:
   - search

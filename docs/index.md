@@ -1,19 +1,53 @@
-# Welcome to Sample Project Official Documentation
+# Sample project
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
-
-## Commands
-
-- `mkdocs serve` - Start the live-reloading docs server.
-- `mkdocs build` - Build the documentation site.
+## Admonitions
 
 !!! info
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
-nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
-massa, nec semper lorem quam in massa.
-sdf
+This is an info box.
 
-## Sample layout
+!!! note
+This is a note box.
+
+!!! danger
+This is a danger box.
+
+!!! warning
+This is a warning box.
+
+!!! abstract
+This is an abstract box.
+
+!!! tip
+This is a tip box.
+
+!!! failure
+This is a failure box.
+
+!!! bug
+This is a bug box.
+
+!!! example
+This is an example box.
+
+!!! quote
+This is a quote box.
+
+!!! question
+This is a question box.
+
+!!! success
+This is a success box.
+
+!!! details
+This is a details box.
+
+!!! details "Special note"
+This is another details box.
+
+???+ details More details
+This one can be opened and closed.
+
+## Mermaid diagrams
 
 ```mermaid
 graph LR
@@ -23,6 +57,31 @@ graph LR
   D --> B;
   B ---->|No| E[Yay!];
 ```
+
+## Code
+
+```python title="Hello world"
+print("hello world")
+```
+
+## Tabs
+
+=== "Java"
+`java public class Thing {} `
+
+=== "Scala"
+`scala class Thing {} `
+
+=== "Kotlin"
+`kotlin class Thing `
+
+## MathJax Math
+
+$$
+J(x) = \sum_{i=1}^n \left( \frac{1}{2} \right)^2
+$$
+
+## File hierarchy
 
 ```bash
 ├── docs
