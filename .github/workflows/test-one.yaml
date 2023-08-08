@@ -21,16 +21,3 @@ permissions:
 jobs:
   test:
     name: Run tests for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
-    runs-on: "${{ github.event.inputs.os }}"
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "${{ github.event.inputs.python }}"
-      - name: Test on ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
-        run: hatch run test
-      - name: Upload coverage for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-${{ github.event.inputs.os }}-${{ github.event.inputs.python }}
-          path: .coverage

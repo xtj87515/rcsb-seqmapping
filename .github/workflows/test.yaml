@@ -15,17 +15,27 @@ permissions:
 
 jobs:
   test-matrix:
-    name: Test matrix
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest", "macos-latest"]
         # :tyranno: python: ${tool.hatch.envs.all.matrix.python~[0]~}
         python: ["3.11", "3.12-dev"]
-    uses: ./.github/workflows/test-one.yaml
-    with:
-      os: ${{ matrix.os }}
-      python: ${{ matrix.python }}
-    secrets: inherit
+    runs-on: ${{ matrix.os }}
+    name: Run tests for ${{ matrix.os }}/py${{ matrix.python }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "${{ matrix.python }}"
+      - name: Test on ${{ matrix.os }}/py${{ matrix.python }}
+        run: |
+          pip install hatch
+          hatch run test
+      - name: Upload coverage for ${{ matrix.os }}/py${{ matrix.python }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.python }}
+          path: .coverage
 
   test-docker:
     strategy:
@@ -70,7 +80,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run Bandit
-        run: hatch run bandit
+        run: |
+          pip install hatch
+          hatch run bandit
 
   docs:
     name: Test building docs
