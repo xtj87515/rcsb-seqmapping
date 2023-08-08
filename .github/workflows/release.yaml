@@ -22,8 +22,8 @@ permissions:
 
 jobs:
   bump:
-    runs-on: ubuntu-latest
     name: Bump version and create changelog with commitizen
+    runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

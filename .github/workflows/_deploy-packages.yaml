@@ -20,6 +20,7 @@ permissions:
 
 jobs:
   publish-github-release:
+    name: Publish GitHub Release
     needs: [bump]
     runs-on: ${{ os }}
     steps:
@@ -29,7 +30,7 @@ jobs:
           name: dist
       - name: Get release notes
         id: release-notes
-        run: echo "release_notes=$(cz changelog --dry-run ${{ github.ref }})" >> $GITHUB_OUTPUT
+        run: echo "release_notes=$(cz changelog --dry-run ${{ github.ref_name }})" >> $GITHUB_OUTPUT
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v1
         #if: startsWith(github.ref, 'refs/tags/')
@@ -42,6 +43,7 @@ jobs:
           files: dist/*
 
   publish-pypi:
+    name: Publish to PyPi
     needs: [bump]
     runs-on: ${{ os }}
     steps:
@@ -59,6 +61,7 @@ jobs:
         if: ${{ env.pypi_token != '' }}
 
   publish-docker:
+    name: Publish to Docker container registries
     needs: [bump]
     runs-on: ${{ os }}
     steps:

@@ -15,10 +15,10 @@ permissions:
 
 jobs:
   triage-issue:
-    name: Add issue to project
+    name: Triage issue
     runs-on: ubuntu-latest
     steps:
-      - name: Add needs triage label
+      - name: Add 'awaiting triage' label
         uses: actions/github-script@v6
         with:
           script: |

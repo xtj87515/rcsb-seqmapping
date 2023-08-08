@@ -35,16 +35,16 @@ jobs:
         python: ["3.11"]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Download coverage artifact
+      - name: Download coverage artifact for ${{ matrix.os }}/${{ matrix.python }}
         uses: actions/download-artifact@v3
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.python }}
-      - name: Send to coveralls
+      - name: Send ${{ matrix.os }}/${{ matrix.python }} to coveralls
         uses: coverallsapp/github-action@v2
         with:
           flag-name: run-${{ join(matrix.*, '-') }}
           parallel: true
-      - name: Send to codecov
+      - name: Send ${{ matrix.os }}/${{ matrix.python }} to codecov
         uses: codecov/codecov-action@v3
         with:
           env_vars: matrix.os,matrix.python
@@ -56,7 +56,7 @@ jobs:
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - name: Coveralls finished
+      - name: Send final data to coveralls
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true
