@@ -27,15 +27,8 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ github.event.inputs.python }}"
-      - name: Install on ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
-        run: pip install .[test]
       - name: Test on ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
-        run: pytest tests/
-      - name: Upload wheels for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist-${{ github.event.inputs.os }}-${{ github.event.inputs.python }}
-          path: dist/*
+        run: hatch run test
       - name: Upload coverage for ${{ github.event.inputs.os }}/py${{ github.event.inputs.python }}
         uses: actions/upload-artifact@v3
         with:

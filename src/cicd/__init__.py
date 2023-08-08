@@ -5,13 +5,7 @@
 """
 Project description.
 """
-import logging
-from datetime import UTC, datetime
-from importlib.metadata import PackageNotFoundError
-from importlib.metadata import metadata as __load
 from pathlib import Path
-
-import platformdirs
 
 
 def run(path: Path) -> None:

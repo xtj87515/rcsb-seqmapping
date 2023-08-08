@@ -69,45 +69,45 @@ Changelog = "https://github.com/dmyersturnbull/cicd/blob/main/CHANGELOG.md"
 
 [tool.hatch.envs.default]
 dependencies = [
-  "pre-commit           ~=3.3",
-  "hypothesis           ~=6.0",
-  "pytest               ~=7.0",
+  "pre-commit           >=3.3",
+  "hypothesis           >=6.0",
+  "pytest               >=7.0",
   "tzdata               >=2023",
-  "coverage[toml]       ~=7.0",
-  "pytest-cov           ~=3.0",
-  "mypy                 ~=1.4",
+  "coverage[toml]       >=7.2",
+  "pytest-cov           >=4.0",
+  "mypy                 >=1.4",
   "ruff                 >=0.0.280",
-  "mkdocs               ~=1.5",
-  "mike                 ~=1.2",
-  "mkdocs-material      ~=9.1",
-  "mkdocs-minify-plugin ~=0.7",
+  "mkdocs               >=1.5",
+  "mike                 >=1.1",
+  "mkdocs-material      >=9.1",
+  "mkdocs-minify-plugin >=0.7",
   "mkdocstrings[python] >=0.20",
 ]
 #skip-install = true
 
 [tool.hatch.envs.default.scripts]
 test = [
-  "pytest tests/",
-]
-bandit = [
-  "ruff --select S {args:.}",
-]
-lint = [
-  "ruff {args:.}",
-  "mypy --non-interactive {args:src/cicd tests}"
-]
-fmt = [
-  "black {args:.}",
-  "ruff --fix-only {args:.}",
+  "pytest --cov --cov-config=pyproject.toml {args:tests/}",
 ]
 clean = [
   "tyranno clean"
 ]
 build-docs = [
-  "mkdocs build"
+  "mkdocs build --clean --strict"
 ]
 serve-docs = [
   "mkdocs serve"
+]
+fmt = [
+  "pre-commit run --all-files"
+]
+bandit = [
+  "ruff --select S {args:.}",
+  #"nbqa ruff --select S {args:.}"  # if using notebooks (also add nbqa to dependencies)
+]
+lint = [
+  "pre-commit run --all-files --no-fail-fast",
+  "mypy --non-interactive {args:src/cicd tests}"
 ]
 
 
@@ -181,7 +181,6 @@ ignore = [
   "E501",     # Line > 79 chars (we use black)
 ]
 unfixable = [
-  "F401",     # Don't touch unused imports
   "RUF100",   # Unused noqa (should fix manually)
 ]
 flake8-bandit.check-typed-exception = true
@@ -227,16 +226,22 @@ doctest_optionflags = [
 ###################
 
 [tool.coverage.run]
-source = ["src"]
+branch = true
+# :tyranno: source_pkgs = ["src/${project.name}", "tests"]
+source_pkgs = ["cicd", "tests"]
+omit = [
+  "src/**/__main__.py"
+]
 
 [tool.coverage.paths]
-src = ["src/cicd"]
+# :tyranno: ${project.name} = ["src/${project.name}"]
+cicd = ["src/cicd"]
 tests = ["tests"]
 
 [tool.coverage.report]
 show_missing = true
 exclude_lines = [
-  "pragma: no cover",
+  "nocov",
   "def __repr__",
   "raise AssertionError",
   "raise NotImplementedError",
@@ -251,6 +256,21 @@ exclude_lines = [
 [tool.black]
 # :tyranno: line-length = ${tool.ruff.line-length}
 line-length = 120
+
+
+###################
+# MyPy
+###################
+[tool.mypy]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+follow_imports = "normal"
+ignore_missing_imports = true
+pretty = true
+show_column_numbers = true
+show_error_codes = true
+warn_no_return = false
+warn_unused_ignores = true
 
 
 ###################
