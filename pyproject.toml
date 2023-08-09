@@ -102,6 +102,7 @@ reinitialize-docs = [
   "mike deploy --config-file mkdocs.yaml {args} latest",
   "mike set-default --config-file mkdocs.yaml latest",
 ]
+set-default-docs = "mike set-default --config-file mkdocs.yaml latest"
 fmt = "pre-commit run --all-files"
 bandit = "ruff --select S {args:.}"
 lint = [
