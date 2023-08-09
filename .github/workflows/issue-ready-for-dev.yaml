@@ -3,7 +3,7 @@ name: Triage issue
 on:
   issues:
     types:
-      - opened
+      - labeled
 
 concurrency:
   group: ${{ github.workflow }}-issue
@@ -14,15 +14,16 @@ permissions:
   repository-projects: write
 
 jobs:
-  triage-issue:
-    name: Triage issue
+  add-issue-to-project:
+    if: "contains(github.event.issue.labels.*.name, 'status: ready for dev')"
+    name: Add issue to project
     runs-on: ubuntu-latest
     steps:
-      - name: Add 'awaiting triage' label
+      - name: Delete 'awaiting triage' label
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.addLabels({
+            github.rest.issues.deleteLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
