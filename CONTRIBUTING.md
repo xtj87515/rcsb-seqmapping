@@ -135,7 +135,6 @@ class Cat(BaseModel):
 #### With dataclasses
 
 Use, wherever possible: `slots=True, frozen=True, order=True`
-Use `KW_ONLY` in favor of `kwonly=True` (for consistency).
 
 ```python
 import orjson

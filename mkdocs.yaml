@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
 # :tyranno: site_name: "${project.name}"
 site_name: "CICD"
 
@@ -9,7 +13,7 @@ site_description: "CI/CD example"
 # Navigation menu
 nav:
   - Home: index.md
-  - Introduction: intro.md
+  - Guide: guide.md
   - API: ref.md
 
 # Theme

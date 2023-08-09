@@ -12,9 +12,6 @@ build:
         before:
           - "pip install 'hatchling~=1.7'"
     analysis:
-      tests:
-        override:
-          - py-scrutinizer-run
 checks:
   python:
     code_rating: true
