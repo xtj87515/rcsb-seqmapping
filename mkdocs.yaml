@@ -51,8 +51,6 @@ theme:
   # :tyranno: repo_url: ${project.urls.Source}
   repo_url: https://github.com/dmyersturnbull/cicd
   extra:
-    version:
-      provider: mike
     consent:
       title: Cookie consent
       description: >-
@@ -121,9 +119,14 @@ plugins:
           options:
             show_submodules: true
   - mike:
-      canonical_version: null
+      canonical_version: latest
   - minify:
       minify_html: true
       minify_js: true
       minify_css: true
       cache_safe: true
+
+extra:
+  version:
+    provider: mike
+    default: latest

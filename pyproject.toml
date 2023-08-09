@@ -91,9 +91,17 @@ test = "pytest"
 clean = "tyranno clean"
 changelog = "cz changelog"
 build-docs = "mkdocs build --clean --strict"
-serve-docs = "mkdocs serve"
+serve-docs = "mike serve --config-file mkdocs.yaml"
 deploy-docs = "mike deploy --config-file mkdocs.yaml {args}"
-obliterate-docs = "mike delete --all"
+deploy-docs-latest = "mike deploy --config-file mkdocs.yaml {args} latest --update-aliases"
+obliterate-docs = [
+  "mike delete --config-file mkdocs.yaml --all"
+]
+reinitialize-docs = [
+  "mike delete --config-file mkdocs.yaml --all",
+  "mike deploy --config-file mkdocs.yaml {args} latest",
+  "mike set-default --config-file mkdocs.yaml latest",
+]
 fmt = "pre-commit run --all-files"
 bandit = "ruff --select S {args:.}"
 lint = [
