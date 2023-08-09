@@ -86,8 +86,10 @@ dependencies = [
 #skip-install = true
 
 [tool.hatch.envs.default.scripts]
+commit = "cz commit {args}"
 test = "pytest"
 clean = "tyranno clean"
+changelog = "cz changelog"
 build-docs = "mkdocs build --clean --strict"
 serve-docs = "mkdocs serve"
 deploy-docs = "mike deploy --config-file mkdocs.yaml {args}"
@@ -288,7 +290,148 @@ bump_message = "chore: bump version $current_version → $new_version"
 #pre_bump_hooks = [
 #  "tyranno sync"  # make the versions match
 #]
-name = "cz_conventional_commits"
+#name = "cz_conventional_commits"
+name = "cz_customize"
+
+[tool.commitizen.customize]
+example = "feat: this feature enable customize through config file"
+info = """
+We use [Conventional Commits](https://www.conventionalcommits.org/) with the following types.
+
+| Type        | Label               | Changelog section     | semver | Description                         |
+| ----------- | ------------------- | --------------------- | ------ | ----------------------------------- |
+| `security:` | `type: security`    | `🔒 Security`         | minor  | Security issue                      |
+| `feat:`     | `type: feature`     | `✨ Features`         | minor  | Add or change a feature             |
+| `fix:`      | `type: fix`         | `🐛 Bug fixes`        | patch  | Fix a bug                           |
+| `docs:`     | `type: docs`        | `📝 Documentation`    | patch  | Add or modify docs or examples      |
+| `build:`    | `type: build`       | `🔧 Build system`     | minor  | Modify build, including Docker      |
+| `perf:`     | `type: performance` | `⚡️ Performance`     | patch  | Increase speed / decrease resources |
+| `test:`     | `type: test`        | `🚨 Tests`            | N/A    | Add or modify tests                 |
+| `refactor:` | `type: refactor`    | ignored               | N/A    | Refactor source code                |
+| `style:`    | `type: style`       | ignored               | N/A    | Improve style of source code        |
+| `chore:`    | `type: chore`       | ignored               | N/A    | Change non-source code              |
+| `ci:`       | `type: ci`          | ignored               | N/A    | Modify CI/CD                        |
+
+"""
+commit_parser =  """
+^(?P<change_type>feat|security|fix|perf|build|docs|test|refactor|ci|style|chore)
+(?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?:\\s(?P<message>.*)?
+"""
+changelog_pattern = "^(feat|security|fix|perf|build|docs)?(!)?"
+schema = """
+<type>[<scope>]: <subject>(!)
+<BLANK LINE>
+<body>
+<BLANK LINE>
+(BREAKING CHANGE: <breaking>)
+(Closes: #<issue>)
+(Co-authored-by: <author>)
+Signed-off-by: <author>
+"""
+schema_pattern = """\
+(?s)"\
+(feat|fix|security|perf|build|docs|test|refactor|ci|style|chore)\
+(\\(\\S+\\))?!?:\
+( [^\n\r]+)\
+((\n\n.*)|(\\s*))?$\
+"""
+
+message_template = """\
+{{change_type}}\
+{% if scope %}{{scope}}{% endif %}\
+{% if breaking %}!{% endif %}\
+: {{subject}}\
+\n{{body}}\
+{% if breaking %}\nBREAKING CHANGE:{% endif %}\
+{% for issue in issues %}\nCloses: #{{issue}}{% endfor %}\
+{% for author in coauthors %}\nCo-authored-by: {{author}}{% endfor %}\
+"""
+bump_pattern = "^(feat|fix|security|perf|build|docs)"
+change_type_order = [
+  "breaking",
+  "security",
+  "feat",
+  "fix",
+  "perf",
+  "build",
+  "docs",
+  "test",
+  "refactor",
+  "ci",
+  "style",
+  "chore"
+]
+
+[tool.commitizen.customize.bump_map]
+breaking = "MAJOR"
+feat = "MINOR"
+fix = "PATCH"
+security = "PATCH"
+perf = "PATCH"
+build = "PATCH"
+docs = "PATCH"
+
+[tool.commitizen.customize.change_type_map]
+breaking = "🔨 Breaking changes"
+security = "🔒 Security"
+feat = "✨ Features"
+fix = "🐛 Bug fixes"
+perf = "⚡️ Performance"
+build = "🔧 Build"
+docs = "📚 Documentation"
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "change_type"
+message = "Select the type of change you are committing"
+choices = [
+  {value = "feat", name = "feat: A new feature."},
+  {value = "fix", name = "fix: A bug fix."},
+  {value = "security", name = "security: An exploit fix."},
+  {value = "perf", name = "perf: A performance improvement."},
+  {value = "build", name = "build: A build system change."},
+  {value = "test", name = "test: Add/change tests."},
+  {value = "docs", name = "docs: A change to documentation."},
+  {value = "refactor", name = "refactor: A code refactoring."},
+  {value = "ci", name = "ci/cd: A change to CI/CD."},
+  {value = "style", name = "code style: A change to code style."},
+  {value = "chore", name = "chore: A change to something non-code."},
+]
+
+[[tool.commitizen.customize.questions]]
+type = "list"
+name = "scope"
+message = "Scope (press [enter] to skip).\n"
+choices = [
+  {value = "", name = "[none]"},
+  {value = "i18n", name = "i18n: Internationalization."},
+  {value = "plugins", name = "plugins: Plugins."}
+]
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "A short, imperative summary: (lowercase and no period).\n"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "body"
+message = "Body. Additional information: (press [enter] to skip)\n"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "breaking"
+message = "Breaking change details: (press [enter] to skip)\n"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "issues"
+message = "Issue(s) closed in the form 1, 2: (press [enter] to skip)\n"
+
+[[tool.commitizen.customize.questions]]
+type = "input"
+name = "coauthors"
+message = "Co-authors in the form name <email>: (press [enter] to skip)\n"
 
 
 ###################

@@ -6,7 +6,7 @@ on:
       - opened
 
 concurrency:
-  group: ${{ github.workflow }
+  group: ${{ github.workflow }}-issue
   cancel-in-progress: true
 
 permissions:

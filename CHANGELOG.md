@@ -1,11 +1,18 @@
-# Changelog
+## Unreleased
 
-Adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### ✨ Features
 
-## [0.1.0] - unreleased
+- fix test setup
+- improve workflows
+- improve workflows
+- improve test workflow
+- figure out docs
+- improve testing
+- use mike
+- mkdocs
+- initial commit
 
-### Breaking Changes
+### 🐛 Bug fixes
 
-### Added
-
-### Changed
+- settings
+- it's settings.yml

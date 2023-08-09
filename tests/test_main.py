@@ -4,9 +4,8 @@
 from pathlib import Path
 from typing import Self
 
-import pytest
-
 import cicd
+import pytest
 
 
 class TestMain:

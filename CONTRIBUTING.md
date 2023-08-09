@@ -22,45 +22,43 @@ and the [Contributor Code of Conduct, version 2.0](https://www.contributor-coven
 
 ### How to contribute
 
-1. Fork and clone locally.
-2. If there is not one, [create an issue](https://github.com/dmyersturnbull/cicdsaurus/issues/new/choose).
+1. Set up GPG keys if you haven’t already.
+2. Fork and clone locally.
+3. If there isn’t one, [create an issue](https://github.com/dmyersturnbull/cicdsaurus/issues/new/choose).
    You may want to solicit feedback for feature changes before doing any work.
-3. `git checkout -b <type>/<username>/<description>`, where `<type>` is the `type:` label of the issue,
-   and `description` MAY be the issue number.
-4. Make the changes. Follow the commit message rules described below.
-   (Note: Because linting is applied per commit, you may have to re-run `git commit`.)
-5. Consider rebasing to squash and revise your commits before pushing.
-6. Push the branch to your fork and open a pull request.
+4. `git checkout -b <type>/<username>/<description>`, where `<type>` is the `type:` label of the issue,
+   and `description` is a 1-2-word description.
+5. To commit, run `hatch run fmt` followed by `hatch run commit --signoff`.
+6. Rebase to squash and revise your commits before pushing.
+   Most feature branches should end up with between 1 and 10 commits.
+7. Push the branch to your fork and open a pull request.
    Name your pull request just like a commit. The type should match the `type:` label of the issue.
    Note that the maintainers will likely squash and lint your commits.
-7. When finished, mark the pull request as ready for review.
+8. When finished, mark the pull request as ready for review.
+
+### Committing
+
+Use `hatch run commit --signoff` instead of `git commit`.
+`--signoff` indicates your agreement to the [Developer Certificate of Origin](https://developercertificate.org/),
+certifying that you have the right to submit your contributions under this project’s license.
 
 ### Commit messages
 
-When committing, please use GPG keys and commit with `git commit --signoff` or `cz commit --signoff`.
+We use [Conventional Commits](https://www.conventionalcommits.org/) with the following types.
 
-Please follow [Conventional Commits](https://www.conventionalcommits.org/).
-Use `!` for breaking changes and use the following types.
-
-_About revert commits:_
-Only use `revert:` to revert changes you made in your dev branch, and record the hash of the reverted commit.
-Please rebase and ignore both commits before pushing.
-
-| Type        | Label               | Changelog section     | semver | Description                         |
-| ----------- | ------------------- | --------------------- | ------ | ----------------------------------- |
-| `!`         | `breaking`          | `🔨 Breaking changes` | major  | Breaking change                     |
-| `security:` | `type: security`    | `🔒 Security`         | minor  | Security issue                      |
-| `feat:`     | `type: feature`     | `✨ Features`         | minor  | Add or change a feature             |
-| `fix:`      | `type: fix`         | `🐛 Bug fixes`        | patch  | Fix a bug                           |
-| `docs:`     | `type: docs`        | `📝 Documentation`    | patch  | Add or modify docs or examples      |
-| `build:`    | `type: build`       | `🔧 Build system`     | minor  | Modify build, including Docker      |
-| `perf:`     | `type: performance` | `⚡️ Performance`     | patch  | Increase speed / decrease resources |
-| `test:`     | `type: test`        | `🚨 Tests`            | N/A    | Add or modify tests                 |
-| `refactor:` | `type: refactor`    | ignored               | N/A    | Refactor source code                |
-| `style:`    | `type: style`       | ignored               | N/A    | Improve style of source code        |
-| `chore:`    | `type: chore`       | ignored               | N/A    | Change non-source code              |
-| `ci:`       | `type: ci`          | ignored               | N/A    | Modify CI/CD                        |
-| `revert:`   | always squash       | N/A                   | N/A    | Revert a recent change              |
+| Type        | Label               | Changelog section  | semver | Description                         |
+| ----------- | ------------------- | ------------------ | ------ | ----------------------------------- |
+| `security:` | `type: security`    | `🔒 Security`      | minor  | Security issue                      |
+| `feat:`     | `type: feature`     | `✨ Features`      | minor  | Add or change a feature             |
+| `fix:`      | `type: fix`         | `🐛 Bug fixes`     | patch  | Fix a bug                           |
+| `docs:`     | `type: docs`        | `📝 Documentation` | patch  | Add or modify docs or examples      |
+| `build:`    | `type: build`       | `🔧 Build system`  | minor  | Modify build, including Docker      |
+| `perf:`     | `type: performance` | `⚡️ Performance`  | patch  | Increase speed / decrease resources |
+| `test:`     | `type: test`        | `🚨 Tests`         | N/A    | Add or modify tests                 |
+| `refactor:` | `type: refactor`    | ignored            | N/A    | Refactor source code                |
+| `style:`    | `type: style`       | ignored            | N/A    | Improve style of source code        |
+| `chore:`    | `type: chore`       | ignored            | N/A    | Change non-source code              |
+| `ci:`       | `type: ci`          | ignored            | N/A    | Modify CI/CD                        |
 
 ## For maintainers
 
@@ -72,8 +70,7 @@ If changes are needed and the author does not respond, consider
 
 ### Commit messages
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/),
-the [Angular commit guidelines](https://github.com/angular/angular/blob/master/CONTRIBUTING.md),
+We follow [Conventional Commits](https://www.conventionalcommits.org/)
 and [Semantic Versioning 2](https://semver.org/spec/v2.0.0.html).
 We follow the “Guiding Principles” of [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/)
 but not the “Types of changes”, which contradict the Angular commit types.
