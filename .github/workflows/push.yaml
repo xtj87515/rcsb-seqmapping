@@ -71,8 +71,8 @@ jobs:
         with:
           python-version: "3.11"
       - run: |
-          pip install hatch
-          hatch run changelog
+          pip install commitizen
+          cz changelog
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: auto-generate changelog"
