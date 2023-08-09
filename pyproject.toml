@@ -287,14 +287,12 @@ gpg_sign = true
 version_scheme = "semver"
 version_provider = "pep621"
 bump_message = "chore: bump version $current_version → $new_version"
-#pre_bump_hooks = [
-#  "tyranno sync"  # make the versions match
-#]
-#name = "cz_conventional_commits"
 name = "cz_customize"
 
 [tool.commitizen.customize]
-example = "feat: this feature enable customize through config file"
+
+example = "feat(i18n): add Japanese translation"
+
 info = """
 We use [Conventional Commits](https://www.conventionalcommits.org/) with the following types.
 
@@ -311,13 +309,15 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) with the fol
 | `style:`    | `type: style`       | ignored               | N/A    | Improve style of source code        |
 | `chore:`    | `type: chore`       | ignored               | N/A    | Change non-source code              |
 | `ci:`       | `type: ci`          | ignored               | N/A    | Modify CI/CD                        |
-
 """
+
 commit_parser =  """
 ^(?P<change_type>feat|security|fix|perf|build|docs|test|refactor|ci|style|chore)
 (?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?:\\s(?P<message>.*)?
 """
+
 changelog_pattern = "^(feat|security|fix|perf|build|docs)?(!)?"
+
 schema = """
 <type>[<scope>]: <subject>(!)
 <BLANK LINE>
@@ -328,6 +328,7 @@ schema = """
 (Co-authored-by: <author>)
 Signed-off-by: <author>
 """
+
 schema_pattern = """\
 (?s)"\
 (feat|fix|security|perf|build|docs|test|refactor|ci|style|chore)\
@@ -343,10 +344,18 @@ message_template = """\
 : {{subject}}\
 \n{{body}}\
 {% if breaking %}\nBREAKING CHANGE:{% endif %}\
-{% for issue in issues %}\nCloses: #{{issue}}{% endfor %}\
-{% for author in coauthors %}\nCo-authored-by: {{author}}{% endfor %}\
+{% if issues %}\
+{% set issuelist = issues.split(';') %}\
+{% for issue in issuelist %}\nCloses: #{{issue}}{% endfor %}\
+{% endif %}
+{% if coauthors %}\
+{% set coauthorlist = coauthors.split(';') %}\
+{% for author in coauthorlist %}\nCo-authored-by: {{author}}{% endfor %}\
+{% endif %}\
 """
+
 bump_pattern = "^(feat|fix|security|perf|build|docs)"
+
 change_type_order = [
   "breaking",
   "security",
@@ -426,12 +435,12 @@ message = "Breaking change details: (press [enter] to skip)\n"
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "issues"
-message = "Issue(s) closed in the form 1, 2: (press [enter] to skip)\n"
+message = "Closed issue, separated by semicolons: (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "coauthors"
-message = "Co-authors in the form name <email>: (press [enter] to skip)\n"
+message = "Co-authors in the form 'name <email>; name <email>': (press [enter] to skip)\n"
 
 
 ###################
