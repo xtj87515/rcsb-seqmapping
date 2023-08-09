@@ -31,5 +31,5 @@ jobs:
       - uses: actions/add-to-project@v0.5.0
         with:
           project-url: https://github.com/users/dmyersturnbull/projects/5
-          github-token: ${{ github.token }}
           label-operator: OR
+          github-token: ${{ secrets.PAT }}

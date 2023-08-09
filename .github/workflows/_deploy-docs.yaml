@@ -6,9 +6,10 @@ name: Deploy docs
 
 on:
   push:
-    branches:
-      - main
-    tags: ["v*"]
+    tags:
+      - latest # always match latest
+      - "v[1-9]+" # match only major releases
+      # - 'v[0-9]+.[0-9]+.[0-9]*'  # OR: match all semver
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -27,20 +28,11 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
-      - name: Deploy latest docs
-        if: ${{ github.ref_name == 'main' }}
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email github-actions[bot]@users.noreply.github.com
-          pip install hatch
-          git fetch origin gh-pages
-          hatch run deploy-docs --update-aliases latest --push
       - name: Deploy docs for ${{ github.ref_name }}
-        if: ${{ github.ref_type == 'tag' }}
         run: |
           pip install hatch
-          git fetch origin gh-pages
-          hatch run deploy-docs ${{ github.ref_name }} --push
+          git fetch origin gh-pages  # prevent conflicts
+          hatch run deploy-docs ${{ github.ref_name }} --update-aliases --push
       - name: Checkout gh-pages
         uses: actions/checkout@v3
         with:

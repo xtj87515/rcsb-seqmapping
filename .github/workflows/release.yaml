@@ -39,7 +39,7 @@ jobs:
         name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ secrets.GITHUB_PERSONAL_TOKEN }}
+          github_token: ${{ secrets.PAT }}
           gpg_sign: true
           prerelease: ${{ github.event.inputs.release-type }}
       - name: Print Version
