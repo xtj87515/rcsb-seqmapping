@@ -33,11 +33,13 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email github-actions[bot]@users.noreply.github.com
           pip install hatch
+          git fetch origin gh-pages
           hatch run deploy-docs --update-aliases latest --push
       - name: Deploy docs for ${{ github.ref_name }}
         if: ${{ github.ref_type == 'tag' }}
         run: |
           pip install hatch
+          git fetch origin gh-pages
           hatch run deploy-docs ${{ github.ref_name }} --push
       - name: Checkout gh-pages
         uses: actions/checkout@v3
