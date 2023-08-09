@@ -306,17 +306,17 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) with the fol
 
 | Type        | Label               | Changelog section     | semver | Description                         |
 | ----------- | ------------------- | --------------------- | ------ | ----------------------------------- |
-| `security:` | `type: security`    | `🔒 Security`         | minor  | Security issue                      |
 | `feat:`     | `type: feature`     | `✨ Features`         | minor  | Add or change a feature             |
 | `fix:`      | `type: fix`         | `🐛 Bug fixes`        | patch  | Fix a bug                           |
+| `security:` | `type: security`    | `🔒 Security`         | minor  | Security issue                      |
 | `docs:`     | `type: docs`        | `📝 Documentation`    | patch  | Add or modify docs or examples      |
 | `build:`    | `type: build`       | `🔧 Build system`     | minor  | Modify build, including Docker      |
 | `perf:`     | `type: performance` | `⚡️ Performance`     | patch  | Increase speed / decrease resources |
 | `test:`     | `type: test`        | `🚨 Tests`            | N/A    | Add or modify tests                 |
 | `refactor:` | `type: refactor`    | ignored               | N/A    | Refactor source code                |
+| `ci:`       | `type: ci`          | ignored               | N/A    | Modify CI/CD                        |
 | `style:`    | `type: style`       | ignored               | N/A    | Improve style of source code        |
 | `chore:`    | `type: chore`       | ignored               | N/A    | Change non-source code              |
-| `ci:`       | `type: ci`          | ignored               | N/A    | Modify CI/CD                        |
 """
 
 commit_parser =  """
@@ -324,7 +324,7 @@ commit_parser =  """
 (?:\\((?P<scope>[^()\r\n]*)\\)|\\()?(?P<breaking>!)?:\\s(?P<message>.*)?
 """
 
-changelog_pattern = "^(feat|security|fix|perf|build|docs)?(!)?"
+changelog_pattern = "^(feat|fix|security|perf|build|docs)?(!)?"
 
 schema = """
 <type>[<scope>]: <subject>(!)
@@ -333,32 +333,39 @@ schema = """
 <BLANK LINE>
 (BREAKING CHANGE: <breaking>)
 (Closes: #<issue>)
-(Co-authored-by: <author>)
+(*: <author>)+
 Signed-off-by: <author>
 """
 
+# See https://lore.kernel.org/git/60ad75ac7ffca_2ae08208b@natae.notmuch/
 schema_pattern = """\
 (?s)"\
 (feat|fix|security|perf|build|docs|test|refactor|ci|style|chore)\
-(\\(\\S+\\))?!?:\
-( [^\n\r]+)\
-((\n\n.*)|(\\s*))?$\
+(?:\\(\\([-a-z0-9]+)\\))?\
+(!)?\
+: ([^\n]+)\
+\n?\
+(?:\nBREAKING CHANGE: [^\n]+))?\
+(?:\nCloses: (#\\d+))+\
+(?:\n(Co-authored-by: [^\n]+))+\
+(?:\n((?:Acked-by|Reviewed-by|Helped-by|Reported-by|Mentored-by|Suggested-by|CC|Noticed-by|Tested-by): [^\n]+))?\
+(?:\nSigned-off-by: ([^\n]+))?\
 """
 
 message_template = """\
 {{change_type}}\
-{% if scope %}{{scope}}{% endif %}\
+{% if scope %}{{scope | trim}}{% endif %}\
 {% if breaking %}!{% endif %}\
-: {{subject}}\
-\n{{body}}\
-{% if breaking %}\nBREAKING CHANGE:{% endif %}\
+: {{subject | trim}}\
+\n{{body | trim}}\
+{% if breaking != '' %}\nBREAKING CHANGE: {{breaking | trim}}{% endif %}\
 {% if issues %}\
-{% set issuelist = issues.split(';') %}\
-{% for issue in issuelist %}\nCloses: #{{issue}}{% endfor %}\
+{% set issuelist = issues.split(',') %}\
+{% for issue in issuelist %}\nCloses: #{{issue | trim}}{% endfor %}\
 {% endif %}
-{% if coauthors %}\
-{% set coauthorlist = coauthors.split(';') %}\
-{% for author in coauthorlist %}\nCo-authored-by: {{author}}{% endfor %}\
+{% if trailers %}\
+{% set trailerslist = trailers.split('||') %}\
+{% for trailer in trailerslist %}\n{{trailer | trim}}{% endfor %}\
 {% endif %}\
 """
 
@@ -416,6 +423,11 @@ choices = [
 ]
 
 [[tool.commitizen.customize.questions]]
+type = "input"
+name = "subject"
+message = "A short, imperative summary: (lowercase and no period).\n"
+
+[[tool.commitizen.customize.questions]]
 type = "list"
 name = "scope"
 message = "Scope (press [enter] to skip).\n"
@@ -427,28 +439,23 @@ choices = [
 
 [[tool.commitizen.customize.questions]]
 type = "input"
-name = "subject"
-message = "A short, imperative summary: (lowercase and no period).\n"
-
-[[tool.commitizen.customize.questions]]
-type = "input"
 name = "body"
 message = "Body. Additional information: (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "breaking"
-message = "Breaking change details: (press [enter] to skip)\n"
+message = "If a breaking change, provide details: (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "issues"
-message = "Closed issue, separated by semicolons: (press [enter] to skip)\n"
+message = "Closed issues, separated by commas: (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
-name = "coauthors"
-message = "Co-authors in the form 'name <email>; name <email>': (press [enter] to skip)\n"
+name = "trailers"
+message = "Git trailers, separated by '||'. Each must be in the form '<key>: <value>'; e.g., 'Reviewed-by: John Johnson <john@git.com>': (press [enter] to skip)\n"
 
 
 ###################

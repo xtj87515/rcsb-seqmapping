@@ -31,16 +31,16 @@ jobs:
         uses: amannn/action-semantic-pull-request@v5
         with:
           types: |
-            security
             feat
             fix
-            docs
-            style
-            refactor
+            security
             perf
-            test
             build
+            docs
+            test
+            refactor
             ci
+            style
             chore
         env:
           GITHUB_TOKEN: ${{ github.token }}
