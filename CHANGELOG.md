@@ -1,5 +1,5 @@
 ## Unreleased
 
-### ⚡️ Performance
+### 🐛 Bug fixes
 
-- fix #12 (#17)
+- deleteLabel
