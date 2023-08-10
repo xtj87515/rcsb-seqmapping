@@ -5,6 +5,8 @@
 name: Release
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
     inputs:
       release-type:
@@ -20,13 +22,25 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  prerelease: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release-type || github.event.head_commit.message }}
+
 jobs:
   bump:
     name: Bump version and create changelog with commitizen
+    if: "startsWith(github.event.head_commit.message, 'bump:') || github.event_name == 'workflow_dispatch'"
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ github.token }}
     steps:
+      - if: "${{ github.event_name == 'workflow_dispatch' }}"
+        run: echo "prerelease=${{ github.event.inputs.release-type }}" >> $GITHUB_ENV
+      - if: "${{ github.event.head_commit.message == 'bump: alpha' }}"
+        run: echo "prerelease=alpha" >> $GITHUB_ENV
+      - if: "${{ github.event.head_commit.message == 'bump: beta' }}"
+        run: echo "prerelease=beta" >> $GITHUB_ENV
+      - if: "${{ github.event.head_commit.message == 'bump: rc' }}"
+        run: echo "prerelease=rc" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: Import GPG key
         id: gpg
@@ -44,7 +58,7 @@ jobs:
           git_name: ${{ steps.gpg.outputs.name }}
           git_email: ${{ steps.gpg.outputs.email }}
           gpg_sign: true
-          prerelease: ${{ github.event.inputs.release-type }}
+          prerelease: ${{ prerelease }}
           debug: true
       - name: Print Version
         run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
