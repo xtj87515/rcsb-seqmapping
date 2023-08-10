@@ -23,11 +23,11 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            github.rest.issues.deleteLabels({
+            github.rest.issues.deleteLabel({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              labels: ["status: awaiting triage"]
+              name: "status: awaiting triage"
             })
       - uses: actions/add-to-project@v0.5.0
         with:
