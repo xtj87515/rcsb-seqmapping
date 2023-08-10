@@ -25,7 +25,6 @@ theme:
     - content.code.copy
     - content.code.annotate
   custom_dir: docs/overrides
-  edit_uri: edit/main/docs/
   icon:
     logo: material/cloud
     repo: fontawesome/brands/github

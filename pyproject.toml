@@ -327,13 +327,14 @@ commit_parser =  """\
 changelog_pattern = "^(feat|fix|security|perf|build|docs)?(!)?"
 
 schema = """
-<type>[<scope>]: <subject>(!)
-<BLANK LINE>
+<type>[(<scope>)][!]: <subject>
+
 <body>
-<BLANK LINE>
-(BREAKING CHANGE: <breaking>)
-(Closes: #<issue>)
-(*: <author>)+
+
+[BREAKING CHANGE: <breaking>]
+[Closes: #<issue>]
+[*: <author>]+
+
 Signed-off-by: <author>
 """
 
