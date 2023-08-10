@@ -6,6 +6,11 @@ name: Test
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        type: string
+        description: Ref to checkout
+        default: main
 
 permissions:
   contents: read
@@ -24,6 +29,8 @@ jobs:
     name: Run tests for ${{ matrix.os }}/py${{ matrix.python }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-python@v4
         with:
           python-version: "${{ matrix.python }}"
@@ -45,6 +52,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: "docker build on ${{ matrix.os }}"
         run: docker build .
 
@@ -59,6 +68,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
@@ -76,6 +87,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -91,6 +104,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"
