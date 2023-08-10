@@ -1,5 +1,5 @@
 ## Unreleased
 
-### 🐛 Bug fixes
+### ci
 
-- deleteLabel
+- set gpgsign in workflow
