@@ -321,7 +321,7 @@ commit_parser =  """\
 (?:\\((?P<scope>[-a-z0-9]+)\\))?\
 (?P<breaking>!)?\
 : (?P<message>[^\n]+)\
-.*
+.*\
 """
 
 changelog_pattern = "^(feat|fix|security|perf|build|docs)?(!)?"
@@ -363,7 +363,7 @@ message_template = """\
 {% if issues %}\
 {% set issuelist = issues.split(',') %}\
 {% for issue in issuelist %}\nCloses: #{{issue | trim}}{% endfor %}\
-{% endif %}
+{% endif %}\
 {% if trailers %}\
 {% set trailerslist = trailers.split('||') %}\
 {% for trailer in trailerslist %}\n{{trailer | trim}}{% endfor %}\
@@ -395,15 +395,17 @@ security = "PATCH"
 perf = "PATCH"
 build = "PATCH"
 docs = "PATCH"
+refactor = "PATCH"
 
 [tool.commitizen.customize.change_type_map]
-breaking = "🔨 Breaking changes"
 security = "🔒 Security"
 feat = "✨ Features"
 fix = "🐛 Bug fixes"
 perf = "⚡️ Performance"
 build = "🔧 Build"
 docs = "📚 Documentation"
+refactor = "⛵ Miscellaneous"
+test = "⛵ Miscellaneous"
 
 [[tool.commitizen.customize.questions]]
 type = "list"

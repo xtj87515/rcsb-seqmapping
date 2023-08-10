@@ -14,8 +14,11 @@ concurrency:
 
 permissions:
   contents: read
-  statuses: write
+  statuses: read
+  actions: read
+  security-events: write
   pull-requests: write
+  issues: write
 
 jobs:
   get-branch-name:
