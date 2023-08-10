@@ -52,10 +52,10 @@ jobs:
         with:
           header: semantic-pull-request-error
           message: |
-            Please edit your pull request title to follow the [Conventional Commits specification](https://www.conventionalcommits.org).
-            Using one of these types: `fix`, `feat`, `security`, `perf`, `build`, `test`, `refactor`, `ci`, `style`, `chore`.
-            Details:
+            Please edit your pull request title to follow [Conventional Commits specification](https://www.conventionalcommits.org).
+            Use one of the types `fix`, `feat`, `security`, `perf`, `build`, `test`, `refactor`, `ci`, `style`, `chore`.
 
+            _Details:_
             ```
             ${{ steps.check-semantic-pr-title.outputs.error_message }}
             ```
