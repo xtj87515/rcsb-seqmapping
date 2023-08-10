@@ -6,7 +6,7 @@ name: Pull request
 
 on:
   pull_request:
-    types: [opened, reopened, ready_for_review]
+    types: [opened, reopened, edited, ready_for_review]
     branches:
       - main
       - "releases/**"
@@ -26,7 +26,6 @@ permissions:
 jobs:
   check-title:
     name: Validate PR title
-    if: ${{ github.base_ref != '' || github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     steps:
       - uses: hmarr/debug-action@v2
@@ -53,9 +52,8 @@ jobs:
         with:
           header: semantic-pull-request-error
           message: |
-            Please edit your pull request title to follow the
-            [Conventional Commits specification](https://www.conventionalcommits.org).
-
+            Please edit your pull request title to follow the [Conventional Commits specification](https://www.conventionalcommits.org).
+            Using one of these types: `fix`, `feat`, `security`, `perf`, `build`, `test`, `refactor`, `ci`, `style`, `chore`.
             Details:
 
             ```
@@ -72,4 +70,4 @@ jobs:
     name: Test
     uses: ./.github/workflows/_test.yaml
     secrets: inherit
-    if: ${{ !github.event.pull_request.draft }}
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.ready_for_review }}
