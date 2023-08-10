@@ -1,5 +1,5 @@
 ## Unreleased
 
-### ci
+### ⚡️ Performance
 
-- fix pull permissions
+- fix #12 (#17)
