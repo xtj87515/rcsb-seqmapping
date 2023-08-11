@@ -37,9 +37,28 @@ classifiers = [
   "Topic :: Software Development :: Build Tools",  # :TYRANNO-FIXME:
 ]
 dependencies = [
-  "loguru             >=0.7,<1.0",
-  "tomlkit            >=0.11,<1.0",
-  "typer[all]         ~=0.9"
+  "loguru >=0.7",
+  "tomlkit >=0.11",
+  "typer >=0.9",
+  "platformdirs >=3.10",
+]
+[project.optional-dependencies]
+cli = [
+  "typer[all] >=0.9",
+]
+api = [
+  "aenum >=1",
+  "hypercorn[h3] >=0.14",
+  "celery[amqp,auth,msgpack,gevent] >=5.3",
+  "cramjam >=2.6",
+  "starlette-cramjam >=0.3",
+  "cryptography >=41",
+  "dramatiq[rabbitmq,watch] >=1.14",
+  "fastapi >=0.100",
+  "fastapi-sso >=0.7",
+  "itsdangerous >=2.1",
+  "msgpack-asgi >=1.1",
+  "pymongo >=4.4"
 ]
 
 #===== Scripts =====#
@@ -61,7 +80,6 @@ Tracker = "https://github.com/dmyersturnbull/cicd/issues"
 Download = "https://pypi.org/project/cicd/"
 # :tyranno: ${.home}/blob/main/CHANGELOG.md
 Changelog = "https://github.com/dmyersturnbull/cicd/blob/main/CHANGELOG.md"
-
 
 ###################
 # Hatch

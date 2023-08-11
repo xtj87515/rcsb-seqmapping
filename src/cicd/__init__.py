@@ -3,9 +3,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Project description.
+Import this.
 """
 from pathlib import Path
+
+from cicd._metadata import ProjectInfo
+
+__all__ = ["ProjectInfo", "run", "execute"]
 
 
 def run(path: Path) -> None:

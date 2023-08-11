@@ -33,18 +33,16 @@ LABEL org.opencontainers.image.documentation="https://github.com/dmyersturnbull/
 ENV PYTHONFAULTHANDLER=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONHASHSEED=random
-ENV PIP_NO_CACHE_DIR=off
 ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV PIP_DEFAULT_TIMEOUT=120
 
-# Install system deps
-# :tyranno: RUN pip install '${build-system.requires~[?contains('poetry-core')]~}'
-RUN pip install 'hatchling~=1.7'
-
-# Copy only requirements to cache them in docker layer
 WORKDIR /app
 COPY . /app/
 
-RUN pip install .
+RUN pip install .[api]
 
-CMD cicd --help
+EXPOSE 80
+EXPOSE 443
+EXPOSE 4433
+
+CMD hypercorn cicd.api:app --bind '[::]:80' --bind '[::]:443' --quic-bind '[::]:4433'

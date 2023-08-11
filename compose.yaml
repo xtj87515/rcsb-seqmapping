@@ -1,0 +1,47 @@
+version: "3.8"
+services:
+  web:
+    build: .
+    volumes:
+      - .:/var/lib/app/
+    ports:
+      - "80:80"
+      - "443:443"
+      - "4433:4433"
+    environment:
+      - POSTGRES_URI=postgres://user:password@localhost:5432/app
+      - MONGODB_URI=mongodb://user:password@localhost:27017/app
+    depends_on:
+      - mongodb
+      - postgres
+    networks:
+      - default
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=cicd
+    restart: unless-stopped
+    volumes:
+      - data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+  mongodb:
+    image: mongo:7.0.0-rc10
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - data:/var/lib/mongodb
+    networks:
+      - default
+
+volumes:
+  data:
+
+networks:
+  default:
