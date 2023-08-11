@@ -2,9 +2,12 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
+
 import aenum
 import cramjam
+from bson import ObjectId, json_util
 from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 from fastapi_sso.sso.github import GithubSSO
 from msgpack_asgi import MessagePackMiddleware
 from pymongo import MongoClient
@@ -58,16 +61,23 @@ async def root():
     return {"name": ProjectInfo.summary}
 
 
-@app.put("/data")
+@app.put("/data", response_class=ORJSONResponse)
 async def put_data(post: dict):
+    print(f"Received PUT: '{post}'")
     the_id = mongo.data.insert_one(post).inserted_id
-    return {"id": the_id}
+    result = json_util.dumps({"id": the_id})
+    print(f"Saved as ID '{the_id}'")
+    print(f"Returning data '{result}'")
+    return ORJSONResponse(result)
 
 
-@app.get("/data/{id}")
-async def put_data(the_id: str):
-    data = mongo.data.find_one({"_id": the_id})
-    return {k: v for k, v in data if k != "_id"}
+@app.get("/data/{the_id}", response_class=ORJSONResponse)
+async def get_data(the_id: str):
+    print(f"Received GET for ID '{the_id}'")
+    data = mongo.data.find_one({"_id": ObjectId(the_id)})
+    result = json_util.dumps(data)
+    print(f"Returning data '{result}'")
+    return ORJSONResponse(result)
 
 
 @app.get("/auth/login")

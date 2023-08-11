@@ -8,9 +8,13 @@ services:
       - "80:80"
       - "443:443"
       - "4433:4433"
+    expose:
+      - "80:80"
+      - "443:443"
+      - "4433:4433"
     environment:
       - POSTGRES_URI=postgres://user:password@localhost:5432/app
-      - MONGODB_URI=mongodb://user:password@localhost:27017/app
+      - MONGODB_URI=mongodb://mongodb:27017/app
     depends_on:
       - mongodb
       - postgres
@@ -29,9 +33,6 @@ services:
       - "5432:5432"
   mongodb:
     image: mongo:7.0.0-rc10
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=user
-      - MONGO_INITDB_ROOT_PASSWORD=password
     restart: unless-stopped
     ports:
       - "27017:27017"

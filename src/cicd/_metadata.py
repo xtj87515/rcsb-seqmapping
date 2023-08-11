@@ -9,7 +9,7 @@ import logging
 import os
 from datetime import UTC, datetime
 from importlib.metadata import PackageNotFoundError
-from importlib.metadata import _metadata as __load
+from importlib.metadata import metadata as __load
 from pathlib import Path
 
 import platformdirs

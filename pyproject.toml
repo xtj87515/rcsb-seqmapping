@@ -58,7 +58,8 @@ api = [
   "fastapi-sso >=0.7",
   "itsdangerous >=2.1",
   "msgpack-asgi >=1.1",
-  "pymongo >=4.4"
+  "pymongo >=4.4",
+  "orjson >=3.9",
 ]
 
 #===== Scripts =====#
