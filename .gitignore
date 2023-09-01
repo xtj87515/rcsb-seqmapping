@@ -98,6 +98,7 @@ celerybeat-schedule
 # Keep these config files
 !/.gitignore
 !/.git/config
+!/.cz.toml
 !/.prettierignore
 !/.travis.yml
 !/.travis.yaml
@@ -117,6 +118,15 @@ celerybeat-schedule
 !/.pre-commit-config.yml
 !/.pre-commit-hooks.yaml
 !/.pre-commit-hooks.yml
+!.prettierrc.yaml
+!.prettierrc.yml
+!.prettierrc.json
+!.prettierrc.json5
+!.prettierrc.toml
+!.prettierrc.js
+!.prettierrc.mjs
+!.prettierrc.cjs
+!.package.json
 !.npmignore
 !/.scrutinizer.yaml
 !/.scrutinizer.yml

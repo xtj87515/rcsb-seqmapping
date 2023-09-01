@@ -10,16 +10,10 @@ repos:
     hooks:
       - id: check-case-conflict
       - id: check-merge-conflict
-      - id: check-toml
-      - id: check-json
       - id: check-shebang-scripts-are-executable
       - id: check-symlinks
-      - id: check-yaml
-        exclude: ^recipes/.*
-        args: [--unsafe]
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
-        exclude: "^tests/(?:resources|data)/"
       - id: fix-encoding-pragma
         args: [--remove]
       - id: trailing-whitespace
@@ -29,11 +23,11 @@ repos:
       - id: commitizen
         stages: ["commit-msg"]
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.6.0
+    rev: v3.7.0
 
   # --- Linters ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.280
+    rev: v0.0.286
     hooks:
       - id: ruff
         args: [--fix-only]
@@ -45,7 +39,7 @@ repos:
       - id: black
 
   - repo: https://github.com/asottile/blacken-docs
-    rev: 1.14.0
+    rev: 1.16.0
     hooks:
       - id: blacken-docs
 
@@ -62,16 +56,14 @@ repos:
       - id: nbqa-ruff
 
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.7.1
+    rev: v3.0.3
     hooks:
       - id: prettier
         stages: [commit]
-        # :tyranno: [--print-width, "${tool.ruff.line-length}"]
-        args: [--print-width, "120"]
-        exclude: ^recipes/.*
-
-  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.9.0
-    hooks:
-      - id: pretty-format-ini
-        args: [--autofix]
+        additional_dependencies:
+          - "prettier@3.0.3"
+          - "prettier-plugin-toml@1.0.0"
+          - "prettier-plugin-ini@1.1.0"
+          - "prettier-plugin-properties@0.2.0"
+          - "prettier-plugin-sql@0.15.1"
+          - "@prettier/plugin-xml@3.2.0"

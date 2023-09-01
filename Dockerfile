@@ -17,13 +17,10 @@ LABEL org.opencontainers.image.version="0.0.1-alpha1"
 LABEL org.opencontainers.image.vendor="dmyersturnbull"
 # :tyranno: LABEL org.opencontainers.image.title="${project.name}"
 LABEL org.opencontainers.image.title="cicd"
-# :tyranno: LABEL org.opencontainers.image.version="${project.version}"
-LABEL org.opencontainers.image.version="0.0.1-alpha0"
 # :tyranno: LABEL org.opencontainers.image.url="${project.urls.homepage}"
 LABEL org.opencontainers.image.url="https://github.com/dmyersturnbull/cicd"
 # :tyranno: LABEL org.opencontainers.image.documentation="${project.urls.docs}"
 LABEL org.opencontainers.image.documentation="https://github.com/dmyersturnbull/cicd"
-
 
 # --------------------------------------
 # ---------- Copy and install ----------

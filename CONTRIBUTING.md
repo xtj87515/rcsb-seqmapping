@@ -12,3 +12,12 @@ Please refer to the
 and [coding conventions](https://dmyersturnbull.github.io/coding-conventions/).
 
 To automatically bump the version and deploy, run the _Deploy_ workflow on GitHub.
+
+Please `npm install`:
+
+- `prettier-plugin-toml`
+- `prettier-plugin-ini`
+- `prettier-plugin-properties`
+- `prettier-plugin-sh`
+- `prettier-plugin-sql`
+- `@prettier/plugin-xml`

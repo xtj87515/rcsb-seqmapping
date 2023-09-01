@@ -1,7 +1,6 @@
 # SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
-
 ###################
 # build-system
 ###################
@@ -9,32 +8,33 @@
 requires = ["hatchling~=1.7"]
 build-backend = "hatchling.build"
 
-
 ###################
 # Project
 ###################
-
 [project]
 name = "cicd"
 requires-python = "~=3.11"
-readme = {file = "README.md", content-type = "text/markdown"}
-version = "0.0.1-alpha0"  # :TYRANNO-FIXME:
-description = "CI/CD test repo."  # :TYRANNO-FIXME:
+readme = { file = "README.md", content-type = "text/markdown" }
+version = "0.0.1-alpha0" # :TYRANNO-FIXME:
+description = "CI/CD test repo" # :TYRANNO-FIXME:
 maintainers = [
-  {name="Douglas Myers-Turnbull", email=" dmyersturnbull@gmail.com"}  # :TYRANNO-FIXME:
+  { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
+  # :TYRANNO-FIXME:
 ]
 authors = [
-  {name="Douglas Myers-Turnbull", email=" dmyersturnbull@gmail.com"}  # :TYRANNO-FIXME:
+  { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
+  # :TYRANNO-FIXME:
 ]
-license = {text="Apache-2.0"}  # :TYRANNO-FIXME:
-keywords = ["python", "ci/cd"]  # :TYRANNO-FIXME:
+license = { text = "Apache-2.0" } # :TYRANNO-FIXME:
+keywords = ["python", "ci", "cd"] # :TYRANNO-FIXME:
 classifiers = [
   "Natural Language :: English",
   "Programming Language :: Python :: 3 :: Only",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Environment :: Console",
-  "Topic :: Software Development :: Build Tools",  # :TYRANNO-FIXME:
+  "Topic :: Software Development :: Build Tools", # :TYRANNO-FIXME:
+
 ]
 dependencies = [
   "loguru >=0.7",
@@ -42,18 +42,17 @@ dependencies = [
   "typer >=0.9",
   "platformdirs >=3.10",
 ]
+
 [project.optional-dependencies]
-cli = [
-  "typer[all] >=0.9",
-]
+cli = ["typer[all] >=0.9"]
 api = [
+  "pydantic >=2.0",
   "aenum >=1",
   "hypercorn[h3] >=0.14",
-  "celery[amqp,auth,msgpack,gevent] >=5.3",
   "cramjam >=2.6",
   "starlette-cramjam >=0.3",
   "cryptography >=41",
-  "dramatiq[rabbitmq,watch] >=1.14",
+  "dramatiq[rabbitmq,redis] >=1.14",
   "fastapi >=0.100",
   "fastapi-sso >=0.7",
   "itsdangerous >=2.1",
@@ -65,7 +64,7 @@ api = [
 #===== Scripts =====#
 [project.scripts]
 # :tyranno: ${project.name} = "${project.name}.__main__:cli"
-tyranno = "cicd.__main__:cli"  # :TYRANNO-FIXME:
+tyranno = "cicd.__main__:cli" # :TYRANNO-FIXME:
 
 #===== URLs =====#
 [project.urls]
@@ -85,25 +84,27 @@ Changelog = "https://github.com/dmyersturnbull/cicd/blob/main/CHANGELOG.md"
 ###################
 # Hatch
 ###################
-
 [tool.hatch.envs.default]
 dependencies = [
-  "pre-commit           >=3.3",
-  "hypothesis           >=6.0",
-  "pytest               >=7.0",
-  "tzdata               >=2023",
-  "coverage[toml]       >=7.2",
-  "pytest-cov           >=4.0",
-  "mypy                 >=1.4",
-  "ruff                 >=0.0.280",
-  "mkdocs               >=1.5",
-  "mike                 >=1.1",
-  "mkdocs-material      >=9.1",
+  "dramatiq[watch] >=1.14",
+  "pre-commit >=3.3",
+  "hypothesis >=6.0",
+  "pytest  >=7.0",
+  "tzdata >=2023",
+  "coverage[toml] >=7.2",
+  "pytest-cov >=4.0",
+  "mypy >=1.4",
+  "ruff >=0.0.280",
+  "mkdocs >=1.5",
+  "mike >=1.1",
+  "mkdocs-literate-nav >=0.6",
+  "mkdocs-material >=9.1",
   "mkdocs-minify-plugin >=0.7",
   "mkdocstrings[python] >=0.20",
+  "mkdocs-table-reader-plugin >=2.0",
 ]
-#skip-install = true
 
+#skip-install = true
 [tool.hatch.envs.default.scripts]
 commit = "cz commit {args}"
 test = "pytest"
@@ -113,9 +114,7 @@ build-docs = "mkdocs build --clean --strict"
 serve-docs = "mike serve --config-file mkdocs.yaml"
 deploy-docs = "mike deploy --config-file mkdocs.yaml {args}"
 deploy-docs-latest = "mike deploy --config-file mkdocs.yaml {args} latest --update-aliases"
-obliterate-docs = [
-  "mike delete --config-file mkdocs.yaml --all"
-]
+obliterate-docs = ["mike delete --config-file mkdocs.yaml --all"]
 set-default-docs = "mike set-default --config-file mkdocs.yaml latest"
 fmt = "pre-commit run --all-files"
 bandit = "ruff --select S {args:.}"
@@ -124,78 +123,74 @@ lint = [
   "mypy --non-interactive {args:src/cicd tests}"
 ]
 
-
 ###################
 # Ruff
 ###################
-
 [tool.ruff]
-line-length = 120  # 120 is hatch's default via 'hatch init'
+line-length = 120 # 120 is hatch's default via 'hatch init'
 include = [
-  "*.py",            # Source
-  "*.pyi",           # Compiled
-  "pyproject.toml",  # This (RUF checks)
-  "*.ipynb"          # Jupyter notebooks
+  "*.py", # Source
+  "*.pyi", # Compiled
+  "pyproject.toml", # This (RUF checks)
+  "*.ipynb"
+  # Jupyter notebooks
 ]
 select = [
-  "A",        # flake8-builtins
-  "ANN",      # flake8-annotations
-  "ASYNC",    # flake8-async
-  "B",        # flake8-bugbear
-  "BLE",      # flake8-blind-exception
-  "C",        # flake8-comprehensions
-  "COM",      # flake8-commas
-  "DTZ",      # flake8-datetimez
-  "EM",       # flake8-errmsg
-  "F",        # pyflakes
-  "FA",       # flake8-future-annotations
-  "E",        # flake8 errors (most fixed by black; rest are nitpicky)
-  "G",        # flake8-logging-concat
-  "I",        # isort
-  "INP",      # flake8-no-pep420
-  "ISC",      # flake8-implicit-str-concat
-  "N",        # flake8-naming
-  "NPY",      # numpy-specific rules
-  "PERF",     # perflint
-  "PGH",      # pygrep-hooks
-  "PIE",      # flake8-pie
-  "PL",       # pylint
-  "PTH",      # flake8-use-pathlib
-  "Q",        # flake8-quotes
-  "RUF",      # Ruff-specific tests
-  "S",        # bandit
-  "SIM",      # flake8-simplify
-  "SLOT",     # flake8-slots
-  "T10",      # debugger
-  "TCH",      # flake8-type-checking
-  "TID",      # flake8-tidy-imports (mostly bans relative imports)
-  "UP",       # pyupgrade
-  "W",        # warnings (most fixed by Black, but W605 is invalid escape char)
-  "YTT",      # flake8-2020 (unlikely problematic checks for Python version)
-  "RUF"       # Ruff-specific rules
+  "A", # flake8-builtins
+  "ANN", # flake8-annotations
+  "ASYNC", # flake8-async
+  "B", # flake8-bugbear
+  "BLE", # flake8-blind-exception
+  "C", # flake8-comprehensions
+  "COM", # flake8-commas
+  "DTZ", # flake8-datetimez
+  "EM", # flake8-errmsg
+  "F", # pyflakes
+  "FA", # flake8-future-annotations
+  "E", # flake8 errors (most fixed by black; rest are nitpicky)
+  "G", # flake8-logging-concat
+  "I", # isort
+  "INP", # flake8-no-pep420
+  "ISC", # flake8-implicit-str-concat
+  "N", # flake8-naming
+  "NPY", # numpy-specific rules
+  "PERF", # perflint
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PL", # pylint
+  "PTH", # flake8-use-pathlib
+  "Q", # flake8-quotes
+  "RUF", # Ruff-specific tests
+  "S", # bandit
+  "SIM", # flake8-simplify
+  "SLOT", # flake8-slots
+  "T10", # debugger
+  "TCH", # flake8-type-checking
+  "TID", # flake8-tidy-imports (mostly bans relative imports)
+  "UP", # pyupgrade
+  "W", # warnings (most fixed by Black, but W605 is invalid escape char)
+  "YTT", # flake8-2020 (unlikely problematic checks for Python version)
+  "RUF"
+  # Ruff-specific rules
 ]
 exclude = [
-  "ARG",      # flake8-unused (unused parameters are almost always intentional, like when overriding)
-  "FBT",      # flake8-boolean-trap (debatable, and might not have a choice)
-  "ICN",      # flake8-import-conventionals (isort does this)
+  "ARG", # flake8-unused (unused parameters are almost always intentional, like when overriding)
+  "FBT", # flake8-boolean-trap (debatable, and might not have a choice)
+  "ICN", # flake8-import-conventionals (isort does this)
+
 ]
 ignore = [
-  "INP001",   # missing __init__ -- false positives
-  "B027",     # Allow non-abstract empty methods in abstract base classes
-  "FBT003",   # Allow boolean positional values in function calls, like `dict.get(... True)`
-  "C901",     # Ignore complexity:
-  "PLR0911",
-  "PLR0912",
-  "PLR0913",
-  "PLR0915",
-  "D107",     # Missing docstring in __init__ (put in class docstring)
-  "D212",     # Multi-line docstring start (contradictory)
-  "E203",     # Colons with space before (sometimes useful expand)
-  "E225",     # Missing whitespace around operator (sometimes useful to condense)
-  "E501",     # Line > 79 chars (we use black)
+  "INP001", # missing __init__ -- false positives
+  "D107", # Missing docstring in __init__ (put in class docstring)
+  "D212", # Multi-line docstring start (contradictory)
+  "E203", # Colons with space before (sometimes useful expand)
+  "E225", # Missing whitespace around operator (sometimes useful to condense)
+  "E501", # Line > 79 chars (we use black)
+
 ]
 unfixable = [
-  "RUF100",   # Unused noqa (should fix manually)
+  "RUF100", # Unused noqa (should fix manually)
+
 ]
 flake8-bandit.check-typed-exception = true
 pydocstyle.convention = "google"
@@ -206,23 +201,23 @@ flake8-tidy-imports.ban-relative-imports = "all"
 
 [tool.ruff.per-file-ignores]
 "tests/**/*" = [
-  "INP001",   # missing __init__
-  "PLR2004",  # magic values
-  "S101",     # assert
-  "TID252",   # relative imports
-  "S105",     # Ignore checks for possible passwords
+  "INP001", # missing __init__
+  "PLR2004", # magic values
+  "S101", # assert
+  "TID252", # relative imports
+  "S105", # Ignore checks for possible passwords
   "S106",
   "S107",
-  "S108",     # Harcoded temp file
-]
+  "S108", # Harcoded temp file
 
+]
 
 ###################
 # pytest
 ###################
 #[tool.pytest]  # in a future version of pytest
 [tool.pytest.ini_options]
-pythonpath = "./src"  # critical!
+pythonpath = "./src" # critical!
 # coverage stops recursing after it finds one dir without an __init__.py
 # so if it finds src/java-app before src/pyapp, it won't find pyapp
 # So specify exactly which directories to test
@@ -240,31 +235,28 @@ markers = [
   "network: marks tests that require network access (deselect with '-m \"not network\"')"
 ]
 doctest_optionflags = [
-  "DONT_ACCEPT_TRUE_FOR_1",  # 1 is not True
-  "NORMALIZE_WHITESPACE",    # allows us to wrap expected output to 120 lines (ignores newlines)
+  "DONT_ACCEPT_TRUE_FOR_1", # 1 is not True
+  "NORMALIZE_WHITESPACE", # allows us to wrap expected output to 120 lines (ignores newlines)
+
 ]
 
 ###################
 # coverage
 ###################
-
 [tool.coverage.run]
 data_file = "coverage.xml"
-branch = true    # quantify % coverage of execution branches
-parallel = true  # note that pytest-cov overrides this
+branch = true # quantify % coverage of execution branches
+parallel = true # note that pytest-cov overrides this
 # :tyranno: source_pkgs = ["src/${project.name}", "tests"]
 source_pkgs = ["cicd"]
-omit = [
-  "src/**/__main__.py"
-]
+omit = ["src/**/__main__.py"]
 
 [tool.coverage.paths]
 source = ["src/"]
 
-
 [tool.coverage.report]
-fail_under = 50  # 50% coverage required
-precision = 1   # n decimal points for coverage %
+fail_under = 50 # 50% coverage required
+precision = 1 # n decimal points for coverage %
 show_missing = true
 exclude_lines = [
   "nocov",
@@ -276,7 +268,6 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-
 ###################
 # Black
 ###################
@@ -284,21 +275,15 @@ exclude_lines = [
 # :tyranno: line-length = ${tool.ruff.line-length}
 line-length = 120
 
-
 ###################
 # MyPy
 ###################
 [tool.mypy]
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
-follow_imports = "normal"
-ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
 pretty = true
 show_column_numbers = true
-show_error_codes = true
-warn_no_return = false
 warn_unused_ignores = true
-
 
 ###################
 # Commitizen
@@ -313,9 +298,7 @@ bump_message = "chore: bump version $current_version → $new_version"
 name = "cz_customize"
 
 [tool.commitizen.customize]
-
 example = "feat(i18n): add Japanese translation"
-
 info = """
 We use [Conventional Commits](https://www.conventionalcommits.org/) with the following types.
 
@@ -534,4 +517,3 @@ SPDX-FileCopyrightText: ${.copyright}
 SPDX-PackageHomePage: ${project.urls.Homepage}
 SPDX-License-Identifier: Apache-2.0
 """
-long_description  = """CI/CD template"""

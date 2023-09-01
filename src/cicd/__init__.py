@@ -3,24 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-Import this.
+CI/CD example.
 """
-from pathlib import Path
+from cicd._internal import Metadata
 
-from cicd._metadata import ProjectInfo
-
-__all__ = ["ProjectInfo", "run", "execute"]
-
-
-def run(path: Path) -> None:
-    """
-    Does a thing.
-
-    Arguments:
-        path: A path to a place
-    """
-    print(path)
-
-
-def execute(path: Path) -> None:
-    print(path)
+__uri__ = Metadata.homepage
+__title__ = Metadata.title
+__summary__ = Metadata.summary
+__version__ = Metadata.version
+__license__ = Metadata.license

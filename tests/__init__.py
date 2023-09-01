@@ -14,8 +14,11 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path, PurePath
-from typing import Any, Self
+from typing import TYPE_CHECKING, Self
 from zoneinfo import ZoneInfo
+
+if TYPE_CHECKING:
+    from types import TracebackType
 
 # Separate logging in the main package vs. inside test functions
 logger_name = Path(__file__).parent.parent.name.upper() + ".TEST"
@@ -45,10 +48,10 @@ class Capture(contextlib.ExitStack):
         self._stderr_context = self.enter_context(contextlib.redirect_stderr(self._stderr))
         return self
 
-    def __exit__(self: Self, *exc: tuple[Any, ...]):
+    def __exit__(self: Self, exc_type: BaseException, exc_value: BaseException, traceback: TracebackType):
         _logger.debug("Finished capturing stdout and stderr")
         # The ExitStack handles everything
-        super().__exit__(*exc)
+        super().__exit__(exc_type, exc_value, traceback)
 
 
 class TestResources:
