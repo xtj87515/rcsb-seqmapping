@@ -95,6 +95,9 @@ db.sqlite3-journal
 # Celery
 celerybeat-schedule
 
+# JavaScript
+node_modules
+
 # Keep these config files
 !/.gitignore
 !/.git/config

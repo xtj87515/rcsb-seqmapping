@@ -32,18 +32,6 @@ This is an example box.
 !!! quote
 This is a quote box.
 
-!!! question
-This is a question box.
-
-!!! success
-This is a success box.
-
-!!! details
-This is a details box.
-
-!!! details "Special note"
-This is another details box.
-
 ???+ details More details
 This one can be opened and closed.
 
@@ -85,13 +73,13 @@ $$
 
 ```bash
 ├── docs
-│   ├── about.md
-│   └── index.md
+│ ├── about.md
+│ └── index.md
 ├── mkdocs.yml
 └── site
-    ├── 404.html
-    ├── about
-    │   └── search_index.json
-    ├── sitemap.xml
-    └── sitemap.xml.gz
+├── 404.html
+├── about
+│ └── search_index.json
+├── sitemap.xml
+└── sitemap.xml.gz
 ```
