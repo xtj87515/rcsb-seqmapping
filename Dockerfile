@@ -5,7 +5,7 @@
 # https://stackoverflow.com/questions/53835198/integrating-python-poetry-with-docker/54763270#54763270
 
 # :tyranno: FROM python:${project.requires-python~.semver_max(@).semver_minor(@)~}
-FROM python:3.11
+FROM python:3.12
 
 # --------------------------------------
 # ------------- Set labels -------------
@@ -40,6 +40,5 @@ RUN pip install .[api]
 
 EXPOSE 80
 EXPOSE 443
-EXPOSE 4433
 
-CMD hypercorn cicd.api:app --bind '[::]:80' --bind '[::]:443' --quic-bind '[::]:4433'
+CMD hypercorn cicd.api:app --bind '[::]:80' --bind '[::]:443' --quic-bind '[::]:443'

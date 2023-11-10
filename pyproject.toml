@@ -15,26 +15,23 @@ build-backend = "hatchling.build"
 name = "cicd"
 requires-python = "~=3.11"
 readme = { file = "README.md", content-type = "text/markdown" }
-version = "0.0.1-alpha0" # :TYRANNO-FIXME:
-description = "CI/CD test repo" # :TYRANNO-FIXME:
+version = "0.0.1-alpha0"
+description = "CI/CD test repo"
 maintainers = [
   { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
-  # :TYRANNO-FIXME:
 ]
 authors = [
   { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
-  # :TYRANNO-FIXME:
 ]
-license = { text = "Apache-2.0" } # :TYRANNO-FIXME:
-keywords = ["python", "ci", "cd"] # :TYRANNO-FIXME:
+license = { text = "Apache-2.0" }
+keywords = ["python", "ci", "cd"]
 classifiers = [
   "Natural Language :: English",
   "Programming Language :: Python :: 3 :: Only",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Environment :: Console",
-  "Topic :: Software Development :: Build Tools", # :TYRANNO-FIXME:
-
+  "Topic :: Software Development :: Build Tools",
 ]
 dependencies = [
   "loguru >=0.7",
@@ -59,12 +56,13 @@ api = [
   "msgpack-asgi >=1.1",
   "pymongo >=4.4",
   "orjson >=3.9",
+  "elasticsearch-dsl >=8.9",
 ]
 
 #===== Scripts =====#
 [project.scripts]
 # :tyranno: ${project.name} = "${project.name}.__main__:cli"
-tyranno = "cicd.__main__:cli" # :TYRANNO-FIXME:
+tyranno = "cicd.__main__:cli"
 
 #===== URLs =====#
 [project.urls]

@@ -1,8 +1,11 @@
+from pathlib import Path
+
 from bson import ObjectId, json_util
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from fastapi_sso.sso.github import GithubSSO
 from starlette.requests import Request
+from starlette.responses import FileResponse
 
 from cicd._internal import Metadata
 from cicd.api._internal import ApiMeta
@@ -59,3 +62,8 @@ def get_data(the_id: str) -> ORJSONResponse:
     result = json_util.dumps(data)
     print(f"Returning data '{result}'")
     return ORJSONResponse(result)
+
+
+@app.get("/video/{the_id}")
+def video(the_id: str) -> FileResponse:
+    return FileResponse(Path(the_id), media_type='video/webm; codecs="av01"')

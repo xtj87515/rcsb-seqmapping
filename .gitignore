@@ -10,10 +10,15 @@
 Thumbs.db
 *.bak
 *.swp
-tmp/
 null
 *.log
 *.pid
+*.lock
+*.out
+
+# Temp dirs
+tmp/
+temp/
 
 # Archives
 *.gz
@@ -40,20 +45,7 @@ null
 *.so
 *.dylib
 
-# Files from other languages
-*.o
-*.ko
-luac.out
-hs_err_pid*
-replay_pid*
-gradle-app.setting
-*.class
-*.jl.cov
-*.jl.*.cov
-*.jl.mem
-deps/deps.jl
-
-# Python temp and build files
+# Python
 env/
 venv/
 ENV/
@@ -68,6 +60,33 @@ build/
 dist/
 eggs/
 sdist/
+
+# Java
+hs_err_pid*
+replay_pid*
+*.class
+/target/
+
+# C/C++
+*.o
+*.ko
+
+# JavaScript
+node_modules/
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+# TypeScript cache
+tsconfig.tsbuildinfo
+
+# Julia
+*.jl.cov
+*.jl.*.cov
+*.jl.mem
+deps/deps.jl
+
+# Terraform
+override.tf
+override.tf.json
 
 # Documentation and coverage
 site/
@@ -95,32 +114,35 @@ db.sqlite3-journal
 # Celery
 celerybeat-schedule
 
-# JavaScript
-node_modules
-
-# Keep these config files
-!/.gitignore
+# Git
+!/.gitattributes
 !/.git/config
-!/.cz.toml
-!/.prettierignore
-!/.travis.yml
-!/.travis.yaml
-!/.circleci/config.yaml
-!/.circleci/config.yml
 !/.git-blame-ignore-revs
-!/.github
-!.gitattributes
-!/.appveyor.yaml
-!/.appveyor.yml
-!/.flake8
-!/.readthedocs.yaml
-!/.readthedocs.yml
-!/.dockerignore
-!/.editorconfig
+
+# pre-commit
 !/.pre-commit-config.yaml
 !/.pre-commit-config.yml
 !/.pre-commit-hooks.yaml
 !/.pre-commit-hooks.yml
+
+# Ignore files
+!/.gitignore
+!/.helmignore
+!/.prettierignore
+!/.dockerignore
+!/.npmignore
+
+# GitHub
+!**/.nojekyll
+!/.github
+
+# NPM package files
+!**/.package.json
+
+# Linters
+!/.cz.toml
+!/.flake8
+!/.editorconfig
 !.prettierrc.yaml
 !.prettierrc.yml
 !.prettierrc.json
@@ -129,8 +151,15 @@ node_modules
 !.prettierrc.js
 !.prettierrc.mjs
 !.prettierrc.cjs
-!.package.json
-!.npmignore
+
+# External service config
+!/.readthedocs.yaml
+!/.readthedocs.yml
 !/.scrutinizer.yaml
 !/.scrutinizer.yml
-!**/.nojekyll
+!/.travis.yml
+!/.travis.yaml
+!/.circleci/config.yaml
+!/.circleci/config.yml
+!/.appveyor.yaml
+!/.appveyor.yml

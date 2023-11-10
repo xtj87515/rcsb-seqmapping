@@ -5,13 +5,15 @@ services:
     volumes:
       - .:/var/lib/app/
     ports:
-      - "80:80"
-      - "443:443"
-      - "4433:4433"
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "80:80/udp"
+      - "443:443/udp"
     expose:
-      - "80:80"
-      - "443:443"
-      - "4433:4433"
+      - "80:80/tcp"
+      - "443:443/tcp"
+      - "80:80/udp"
+      - "443:443/udp"
     environment:
       - POSTGRES_URI=postgres://user:password@postgres:5432/app
       - MONGODB_URI=mongodb://mongodb:27017/app
@@ -28,19 +30,44 @@ services:
       - POSTGRES_DB=app
     restart: unless-stopped
     volumes:
-      - data:/var/lib/postgresql/data/
-      - ./src/sql/init.sql:/docker-entrypoint-initdb.d/0-init.sql
+      - type: volume
+        source: data
+        target: /var/lib/postgresql/data/
+      - type: volume
+        source: ./src/sql/init.sql
+        target: /docker-entrypoint-initdb.d/0-init.sql
     ports:
-      - "5432:5432"
+      - "5432:5432/tcp"
   mongodb:
-    image: mongo:7.0.0
+    image: mongo:7.0.2
     restart: unless-stopped
     ports:
-      - "27017:27017"
+      - "27017:27017/tcp"
     volumes:
-      - data:/var/lib/mongodb
+      - type: volume
+        source: data
+        target: /var/lib/mongodb
     networks:
       - default
+  elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=elasticsearch
+      - discovery.seed_hosts=elasticsearch
+      - cluster.initial_master_nodes=elasticsearch
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - type: volume
+        source: data
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200/tcp"
 
 volumes:
   data:
