@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
-
 """
 CLI for CICD.
 """
+
 from __future__ import annotations
 
 import sys
@@ -15,7 +15,7 @@ from typing import Annotated, Self
 import typer
 from loguru import logger
 
-from cicd._internal import Metadata
+from cicd._meta import Metadata
 from cicd.context import Context
 
 

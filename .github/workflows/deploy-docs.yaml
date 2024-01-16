@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
@@ -8,8 +8,8 @@ on:
   push:
     tags:
       - latest # always match latest
-      - "v[1-9]+" # match only major releases
-      # - 'v[0-9]+.[0-9]+.[0-9]*'  # OR: match all semver
+      - '^v[1-9][0-9]*\.[0-9]+\.[0-9](?:[.+-].*)?$' # match only major releases
+      # - '^v[0-9]+\.[0-9]+\.[0-9](?:[.+-].+)?$'  # OR: match all semver
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -24,8 +24,8 @@ jobs:
   docs-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Deploy docs for ${{ github.ref_name }}
@@ -34,13 +34,13 @@ jobs:
           git fetch origin gh-pages  # prevent conflicts
           hatch run deploy-docs ${{ github.ref_name }} --update-aliases --push
       - name: Checkout gh-pages
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           path: .
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4

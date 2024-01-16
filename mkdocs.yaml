@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
@@ -136,6 +136,9 @@ plugins:
         python:
           options:
             show_submodules: true
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
   #- mkdocs-section-index
   - search
   - table-reader

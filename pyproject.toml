@@ -38,6 +38,7 @@ dependencies = [
   "tomlkit >=0.11",
   "typer >=0.9",
   "platformdirs >=3.10",
+  "commitizen >=3.0",
 ]
 
 [project.optional-dependencies]
@@ -296,6 +297,8 @@ version_scheme = "semver"
 version_provider = "pep621"
 bump_message = "chore: bump version $current_version → $new_version"
 name = "cz_customize"
+changelog_incremental = true
+changelog_merge_prerelease = true
 
 [tool.commitizen.customize]
 example = "feat(i18n): add Japanese translation"
@@ -347,12 +350,17 @@ schema_pattern = """\
 (?:\\(\\([-a-z0-9]+)\\))?\
 (!)?\
 : ([^\n]+)\
-\n?\
+(?:\
+\n\
 (?:\nBREAKING CHANGE: [^\n]+))?\
-(?:\nCloses: (#\\d+))+\
-(?:\n(Co-authored-by: [^\n]+))+\
-(?:\n((?:Acked-by|Reviewed-by|Helped-by|Reported-by|Mentored-by|Suggested-by|CC|Noticed-by|Tested-by): [^\n]+))?\
-(?:\nSigned-off-by: ([^\n]+))?\
+(?:\nCloses: #(\\d+))*\
+(?:\n(Co-authored-by: [^\n]+))*\
+(?:\n((?:\
+  Acked-by|Reviewed-by|Helped-by|Reported-by|Mentored-by|Suggested-by|CC|Noticed-by|Tested-by|Improved-by\
+  |Thanks-to|Based-on-patch-by|Contributions-by|Co-authored-by|Requested-by|Original-patch-by|Inspired-by\
+): [^\n]+))*\
+(?:\nSigned-off-by: ([^\n]+))*\
+)?\
 """
 
 message_template = """\

@@ -29,7 +29,7 @@ jobs:
               repo: context.repo.repo,
               name: "status: awaiting triage"
             })
-      - uses: actions/add-to-project@v0.5.0
+      - uses: actions/add-to-project@v0.5
         with:
           project-url: https://github.com/users/dmyersturnbull/projects/5
           label-operator: OR

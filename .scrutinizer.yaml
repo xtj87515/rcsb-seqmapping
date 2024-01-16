@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +10,7 @@ build:
     my-tests:
       dependencies:
         before:
-          - "pip install 'hatchling~=1.7'"
+          - "pip install 'hatchling~=1.9'"
     analysis:
 checks:
   python:

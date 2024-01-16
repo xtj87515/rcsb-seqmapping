@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
@@ -6,7 +6,9 @@ name: Pull request comment
 
 on:
   issue_comment:
-    types: [created, edited, deleted]
+    types:
+      - created
+      - edited
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -27,7 +29,7 @@ jobs:
     outputs:
       ref: ${{ steps.branch_name.outputs.staging_branch }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Get staging branch name
@@ -36,8 +38,9 @@ jobs:
 
   test:
     name: Test
-    needs: [get-branch-name]
-    uses: ./.github/workflows/_test.yaml
+    needs:
+      - get-branch-name
+    uses: ./.github/workflows/test.yaml
     with:
       ref: ${{ needs.get-branch-name.outputs.ref }}
     secrets: inherit

@@ -1,11 +1,11 @@
 # SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
-
 """
 CI/CD example.
 """
-from cicd._internal import Metadata
+
+from cicd._meta import Metadata
 
 __uri__ = Metadata.homepage
 __title__ = Metadata.title

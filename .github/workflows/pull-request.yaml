@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
@@ -6,9 +6,15 @@ name: Pull request
 
 on:
   pull_request:
-    types: [opened, reopened, edited, ready_for_review]
+    # 'edited' means title, description, or base branch changed
+    # ('synchronize' means a commit was added)
+    types:
+      - opened
+      - edited
+      - ready_for_review
     branches:
       - main
+      - master
       - "releases/**"
 
 concurrency:
@@ -47,12 +53,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - uses: marocchino/sticky-pull-request-comment@v2
-        name: Post Comment, Output on Pull Request
+        name: Post comment to pull request
         if: ${{ !cancelled() && steps.check-semantic-pr-title.outputs.error_message != null }}
         with:
           header: semantic-pull-request-error
           message: |
-            Please edit your pull request title to follow [Conventional Commits specification](https://www.conventionalcommits.org).
+            Please edit your pull request title to follow
+            [Conventional Commits specification](https://www.conventionalcommits.org).
             Use one of the types `fix`, `feat`, `security`, `perf`, `build`, `test`, `refactor`, `ci`, `style`, `chore`.
 
             _Details:_
@@ -68,6 +75,6 @@ jobs:
 
   test:
     name: Test
-    uses: ./.github/workflows/_test.yaml
+    uses: ./.github/workflows/test.yaml
     secrets: inherit
     if: ${{ !github.event.pull_request.draft && github.event.pull_request.ready_for_review }}
