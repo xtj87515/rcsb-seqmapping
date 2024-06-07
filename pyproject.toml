@@ -5,7 +5,7 @@
 # build-system
 ###################
 [build-system]
-requires = ["hatchling~=1.7"]
+requires = ["hatchling~=1.24.2"]
 build-backend = "hatchling.build"
 
 ###################
@@ -13,7 +13,7 @@ build-backend = "hatchling.build"
 ###################
 [project]
 name = "cicd"
-requires-python = "~=3.11"
+requires-python = "~=3.12"
 readme = { file = "README.md", content-type = "text/markdown" }
 version = "0.0.1-alpha0"
 description = "CI/CD test repo"
@@ -35,14 +35,14 @@ classifiers = [
 ]
 dependencies = [
   "loguru >=0.7",
-  "tomlkit >=0.11",
-  "typer >=0.9",
-  "platformdirs >=3.10",
+  "tomlkit >=0.12",
+  "typer-slim >=0.12",
+  "platformdirs >=4.0",
   "commitizen >=3.0",
 ]
 
 [project.optional-dependencies]
-cli = ["typer[all] >=0.9"]
+cli = ["typer-slim[standard] >=0.9"]
 api = [
   "pydantic >=2.0",
   "aenum >=1",
@@ -112,15 +112,18 @@ changelog = "cz changelog"
 build-docs = "mkdocs build --clean --strict"
 serve-docs = "mike serve --config-file mkdocs.yaml"
 deploy-docs = "mike deploy --config-file mkdocs.yaml {args}"
-deploy-docs-latest = "mike deploy --config-file mkdocs.yaml {args} latest --update-aliases"
+deploy-latest-docs = "mike deploy --config-file mkdocs.yaml {args} latest --update-aliases"
 obliterate-docs = ["mike delete --config-file mkdocs.yaml --all"]
 set-default-docs = "mike set-default --config-file mkdocs.yaml latest"
-fmt = "pre-commit run --all-files"
+format = "pre-commit run --all-files"
 bandit = "ruff --select S {args:.}"
 lint = [
   "pre-commit run --all-files",
   "mypy --non-interactive {args:src/cicd tests}"
 ]
+
+[tool.hatch.version]
+path = "src/cicd/__init__.py
 
 ###################
 # Ruff
@@ -270,13 +273,6 @@ exclude_lines = [
 ]
 
 ###################
-# Black
-###################
-[tool.black]
-# :tyranno: line-length = ${tool.ruff.line-length}
-line-length = 120
-
-###################
 # MyPy
 ###################
 [tool.mypy]
@@ -309,13 +305,13 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) with the fol
 | ----------- | ------------------- | --------------------- | ------ | ----------------------------------- |
 | `feat:`     | `type: feature`     | `✨ Features`         | minor  | Add or change a feature             |
 | `fix:`      | `type: fix`         | `🐛 Bug fixes`        | patch  | Fix a bug                           |
-| `security:` | `type: security`    | `🔒 Security`         | minor  | Security issue                      |
-| `docs:`     | `type: docs`        | `📝 Documentation`    | patch  | Add or modify docs or examples      |
+| `security:` | `type: security`    | `🔐 Security`         | minor  | Security issue                      |
+| `docs:`     | `type: docs`        | `✏️ Documentation`    | patch  | Add or modify docs or examples      |
 | `build:`    | `type: build`       | `🔧 Build system`     | minor  | Modify build, including Docker      |
-| `perf:`     | `type: performance` | `⚡️ Performance`     | patch  | Increase speed / decrease resources |
-| `test:`     | `type: test`        | `🚨 Tests`            | N/A    | Add or modify tests                 |
-| `refactor:` | `type: refactor`    | ignored               | N/A    | Refactor source code                |
-| `ci:`       | `type: ci`          | ignored               | N/A    | Modify CI/CD                        |
+| `perf:`     | `type: performance` | `⚡️ Performance`      | patch  | Increase speed / decrease resources |
+| `test:`     | `type: test`        | `🍒 Miscellaneous`    | N/A    | Add or modify tests               |
+| `refactor:` | `type: refactor`    | `🍒 Miscellaneous`    | N/A    | Refactor source code                |
+| `ci:`       | `type: ci`          | `🍒 Miscellaneous`    | N/A    | Modify CI/CD                        |
 | `style:`    | `type: style`       | ignored               | N/A    | Improve style of source code        |
 | `chore:`    | `type: chore`       | ignored               | N/A    | Change non-source code              |
 """
@@ -408,14 +404,14 @@ docs = "PATCH"
 refactor = "PATCH"
 
 [tool.commitizen.customize.change_type_map]
-security = "🔒 Security"
+security = "🔐 Security"
 feat = "✨ Features"
 fix = "🐛 Bug fixes"
 perf = "⚡️ Performance"
 build = "🔧 Build"
-docs = "📚 Documentation"
-refactor = "⛵ Miscellaneous"
-test = "⛵ Miscellaneous"
+docs = "✏️ Documentation"
+refactor = "🍒 Miscellaneous"
+test = "🍒 Miscellaneous"
 
 [[tool.commitizen.customize.questions]]
 type = "list"
