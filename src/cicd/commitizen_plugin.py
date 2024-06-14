@@ -1,31 +1,29 @@
+"""
+Commitizen plugin for the Commitizen package.
+
+Implements a strict syntax for commit messages that narrows the conventional commit standard.
+- Mandates a `!` for breaking changes.
+- Limits trailers to a specific set.
+- Adds trailer types 'Closes' (e.g. `Closes: #32)` and 'Breaks' (e.g. `Breaks: /api/copy endpoint`).
+- Adds extra commit types 'security' and 'deprecation'.
+- Maps commit types to changelog sections and semver changes.
+  'test', 'refactor', 'ci' are added to the 'Miscellaneous' section;
+  'style', and 'chore' are not added to the changelog.
+- Adds commit link, link to issue, and optional author to changelog entries.
+- Replaces the 'BREAKING CHANGE' section with a bold 'Breaking change' note per entry.
+
+**Expreimental; do not use.**
+"""
+
 import dataclasses
 import re
-from dataclasses import dataclass
-from typing import Callable, Self
-
 from commitizen.cz.base import BaseCommitizen
 from commitizen.defaults import Questions
 from commitizen.git import GitCommit
+from dataclasses import dataclass
+from typing import Callable, Self
 
 type ChangeHook = Callable[[str, ChangeInfo], str]
-
-TEMPLATE = """
-{% for entry in tree %}
-
-## {{ entry.version }} – {{ entry.date }}
-
-{% for change_key, changes in entry.changes.items() %}
-
-{% if change_key %}
-### {{ change_key }}
-{% endif %}
-
-{% for change in changes %}
-- {{ change.message }}
-{% endfor %}
-{% endfor %}
-{% endfor %}
-"""
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -320,8 +318,9 @@ Commitz = CommitizenGenerator(
     commit_types=[
         CommitType("feat", "type: feature", "✨ Features", "minor", "Add or change a feature", key="f"),
         CommitType("fix", "type: fix", "🐛 Bug fixes", "patch", "Fix a bug", key="x"),
-        CommitType("security", "type: security", "🔐 Security", "patch", "Fix a security issue", key="v"),
-        CommitType("docs", "type: docs", "✏️ Documentation", "patch", "Add or modify docs or examples", key="d"),
+        CommitType("security", "type: security", "🔒️ Security", "patch", "Fix a security issue", key="v"),
+        CommitType("deprecation", "type: deprecation", "🗑️ Deprecation", None, "Deprecation", key="e"),
+        CommitType("docs", "type: docs", "📝 Documentation", "patch", "Add or modify docs or examples", key="d"),
         CommitType("build", "type: build", "🔧 Build system", "minor", "Modify build, excluding bug fixes", key="b"),
         CommitType("perf", "type: performance", "⚡️ Performance", "patch", "Decrease resource usage", key="p"),
         CommitType("test", "type: test", "🍒 Miscellaneous", None, "Add or modify tests", key="t"),
@@ -333,6 +332,7 @@ Commitz = CommitizenGenerator(
     changelog_sections=[
         "✨ Features",
         "🔐 Security",
+        "🗑️ Deprecation",
         "🐛 Bug fixes",
         "✏️ Documentation",
         "🔧 Build system",

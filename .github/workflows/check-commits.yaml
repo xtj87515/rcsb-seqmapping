@@ -1,0 +1,34 @@
+name: Commitizen Check
+
+on: push
+
+jobs:
+  commitizen-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Commitizen
+        run: 'pip install commitizen>=3.27'
+
+      - name: Get commit messages
+        id: get_commits
+        run: |
+          # Get the list of commit messages in the push
+          commits=$(git log --pretty=format:'%H' ${GITHUB_SHA}~$(($GITHUB_REF_SLICE_PUSHES-1))..${GITHUB_SHA})
+          echo "::set-output name=commits::$commits"
+
+      - name: Check commit messages with Commitizen
+        run: |
+          # Check each commit message with Commitizen
+          for commit in ${{ steps.get_commits.outputs.commits }}
+          do
+            git show -s --format=%B $commit | cz check || exit 1
+          done

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CI/CD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CI/CD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -7,9 +7,11 @@ Metadata and environment variables.
 
 import logging
 import tomllib
+from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import metadata as __load
 from pathlib import Path
+from typing import Self
 
 __all__ = ["Metadata"]
 
@@ -27,10 +29,41 @@ except PackageNotFoundError:  # nocov
         logger.error(f"Could not load metadata for package {_pkg}. Is it installed?")
 
 
-class Metadata:
-    pkg = _pkg
-    homepage = _metadata.get("Home-page")
-    title = _metadata.get("Name")
-    summary = _metadata.get("Summary")
-    license = _metadata.get("License")
-    version = _metadata.get("Version")
+@dataclass(frozen=True, slots=True, order=True)
+class Version:
+    major: str
+    minor: str
+    patch: str
+    pre: str
+    build: str
+
+    def __eq__(self: Self, other: Self | str) -> bool:
+        return str(self) == str(other)
+
+
+@dataclass(frozen=True, slots=True)
+class _Metadata:
+    pkg: str
+    homepage: str
+    title: str
+    summary: str
+    license: str
+    version: str
+
+    @property
+    def version_major(self: Self) -> str:
+        return self.version.split(".")[0]
+
+    @property
+    def version_minor(self: Self) -> str:
+        return self.version.split(".")[0]
+
+
+Metadata = _Metadata(
+    pkg=_pkg,
+    homepage=_metadata.get("Home-page"),
+    title = _metadata.get("Name"),
+    summary = _metadata.get("Summary"),
+    license = _metadata.get("License"),
+    version = _metadata.get("Version"),
+)

@@ -16,7 +16,7 @@ permissions:
 jobs:
   add-issue-to-project:
     if: "contains(github.event.issue.labels.*.name, 'status: ready for dev')"
-    name: Add issue to project
+    name: Delete 'awaiting triage' label
     runs-on: ubuntu-latest
     steps:
       - name: Delete 'awaiting triage' label
@@ -29,8 +29,3 @@ jobs:
               repo: context.repo.repo,
               name: "status: awaiting triage"
             })
-      - uses: actions/add-to-project@v0.5
-        with:
-          project-url: https://github.com/users/dmyersturnbull/projects/5
-          label-operator: OR
-          github-token: ${{ secrets.PAT }}

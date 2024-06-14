@@ -32,7 +32,7 @@ jobs:
         run: |
           pip install hatch
           git fetch origin gh-pages  # prevent conflicts
-          hatch run deploy-docs ${{ github.ref_name }} --update-aliases --push
+          hatch run x-deploy-docs ${{ github.ref_name }} --push
       - name: Checkout gh-pages
         uses: actions/checkout@v4
         with:

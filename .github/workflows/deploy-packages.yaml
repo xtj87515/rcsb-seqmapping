@@ -31,16 +31,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: dist
-      - name: Get release notes
-        id: release-notes
-        run: echo "release_notes=$(cz changelog --dry-run ${{ github.ref_name }})" >> $GITHUB_OUTPUT
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v1
         #if: ${{ github.ref_type == 'tag' }}
         with:
           draft: false
-          generate_release_notes: false
-          body: ${{ steps.release-notes.outputs.release_notes }}
+          generate_release_notes: true
           fail_on_unmatched_files: true
           token: ${{ github.token }}
           files: dist/*
@@ -56,7 +52,7 @@ jobs:
         with:
           name: dist
       - name: Install hatch
-        run: pip install hatch~=1.9
+        run: pip install hatch~=1.12
       - name: Publish to PyPi
         run: hatch publish
         env:

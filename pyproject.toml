@@ -1,22 +1,22 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 ###################
 # build-system
 ###################
 [build-system]
-requires = ["hatchling~=1.24.2"]
 build-backend = "hatchling.build"
+requires = ["hatchling~=1.24.2"]
 
 ###################
 # Project
 ###################
 [project]
 name = "cicd"
-requires-python = "~=3.12"
-readme = { file = "README.md", content-type = "text/markdown" }
 version = "0.0.1-alpha0"
-description = "CI/CD test repo"
+requires-python = "~=3.12"
+readme = { file = "README.md", content-type = "text/markdown" } # 'readme' |--> 'description' in importlib.metadata
+description = "CI/CD test repo" # 'description' |--> 'summary' in importlib.metadata
 maintainers = [
   { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
 ]
@@ -43,22 +43,6 @@ dependencies = [
 
 [project.optional-dependencies]
 cli = ["typer-slim[standard] >=0.9"]
-api = [
-  "pydantic >=2.0",
-  "aenum >=1",
-  "hypercorn[h3] >=0.14",
-  "cramjam >=2.6",
-  "starlette-cramjam >=0.3",
-  "cryptography >=41",
-  "dramatiq[rabbitmq,redis] >=1.14",
-  "fastapi >=0.100",
-  "fastapi-sso >=0.7",
-  "itsdangerous >=2.1",
-  "msgpack-asgi >=1.1",
-  "pymongo >=4.4",
-  "orjson >=3.9",
-  "elasticsearch-dsl >=8.9",
-]
 
 #===== Scripts =====#
 [project.scripts]
@@ -77,65 +61,67 @@ Documentation = "https://dmyersturnbull.github.io/cicd"
 Tracker = "https://github.com/dmyersturnbull/cicd/issues"
 # :tyranno: https://pypi.org/project/${project.name}
 Download = "https://pypi.org/project/cicd/"
-# :tyranno: ${.home}/blob/main/CHANGELOG.md
-Changelog = "https://github.com/dmyersturnbull/cicd/blob/main/CHANGELOG.md"
+# :tyranno: "https://github.com/${.frag}/releases"
+Changelog = "https://github.com/dmyersturnbull/cicd/releases"
 
 ###################
 # Hatch
 ###################
+[tool.hatch.version]
+path = "src/cicd/__init__.py
+
 [tool.hatch.envs.default]
-dependencies = [
-  "dramatiq[watch] >=1.14",
-  "pre-commit >=3.3",
-  "hypothesis >=6.0",
-  "pytest  >=7.0",
-  "tzdata >=2023",
-  "coverage[toml] >=7.2",
-  "pytest-cov >=4.0",
-  "mypy >=1.4",
-  "ruff >=0.0.280",
-  "mkdocs >=1.5",
-  "mike >=1.1",
-  "mkdocs-literate-nav >=0.6",
-  "mkdocs-material >=9.1",
-  "mkdocs-minify-plugin >=0.7",
-  "mkdocstrings[python] >=0.20",
-  "mkdocs-table-reader-plugin >=2.0",
+  dependencies = [
+    "pre-commit >=3.7",
+    "hypothesis >=6.1",
+    "pytest >=8.2",
+    "tzdata >=2024",
+    "coverage[toml] >=7.5",
+    "pytest-cov >=5.0",
+    "mypy >=1.10",
+    "ruff >=0.4.8",
+    "mkdocs >=1.6",
+    "mike >=2.1",
+    "mkdocs-literate-nav >=0.6",
+    "mkdocs-material >=9.5",
+    "mkdocs-minify-plugin >=0.8",
+    "mkdocstrings[python] >=0.25",
+    "mkdocs-table-reader-plugin >=2.2",
 ]
 
 #skip-install = true
 [tool.hatch.envs.default.scripts]
+prep-dev-env = ["pre-commit install", "tyranno clean"]
 commit = "cz commit {args}"
-test = "pytest"
+test = "pytest {args}"
 clean = "tyranno clean"
-changelog = "cz changelog"
-build-docs = "mkdocs build --clean --strict"
-serve-docs = "mike serve --config-file mkdocs.yaml"
-deploy-docs = "mike deploy --config-file mkdocs.yaml {args}"
-deploy-latest-docs = "mike deploy --config-file mkdocs.yaml {args} latest --update-aliases"
-obliterate-docs = ["mike delete --config-file mkdocs.yaml --all"]
-set-default-docs = "mike set-default --config-file mkdocs.yaml latest"
-format = "pre-commit run --all-files"
-bandit = "ruff --select S {args:.}"
+build-docs = "mkdocs build --clean --strict {args}"
+serve-docs = "mkdocs serve --strict {args}"
+format = "ruff format"
 lint = [
-  "pre-commit run --all-files",
+  "ruff check --fix",
   "mypy --non-interactive {args:src/cicd tests}"
 ]
-
-[tool.hatch.version]
-path = "src/cicd/__init__.py
+lint-security = "ruff check --select S"
+# commands that are normally only run in CI/CD
+x-deploy-docs = "mike deploy {args} latest --update-aliases"
+x-build-changelog = "cz changelog {args}"
+# commands to fix and redeploy docs if they're totally broken
+x-obliterate-docs = "mike delete --all" # deletes all versions of docs from gh-pages for rebuilding
+x-redeploy-docs = "mike deploy {args}" # needed only if the docs were deleted or a prior deployment failed
+x-serve-docs = "mike serve {args}" # serves all versions of docs, complete with version selector
 
 ###################
 # Ruff
 ###################
 [tool.ruff]
 line-length = 120 # 120 is hatch's default via 'hatch init'
+docstring-code-format = true
 include = [
   "*.py", # Source
   "*.pyi", # Compiled
-  "pyproject.toml", # This (RUF checks)
-  "*.ipynb"
-  # Jupyter notebooks
+  "pyproject.toml", # This file (RUF rules only)
+  "*.ipynb" # Jupyter notebooks
 ]
 select = [
   "A", # flake8-builtins
@@ -172,54 +158,46 @@ select = [
   "UP", # pyupgrade
   "W", # warnings (most fixed by Black, but W605 is invalid escape char)
   "YTT", # flake8-2020 (unlikely problematic checks for Python version)
-  "RUF"
-  # Ruff-specific rules
+  "RUF" # Ruff-specific rules
 ]
 exclude = [
   "ARG", # flake8-unused (unused parameters are almost always intentional, like when overriding)
   "FBT", # flake8-boolean-trap (debatable, and might not have a choice)
   "ICN", # flake8-import-conventionals (isort does this)
-
 ]
 ignore = [
   "COM812", # contradicts Ruff formatter
-  "D107", # Missing docstring in __init__ (put in class docstring)
-  "D212", # Multi-line docstring start (contradictory)
-  "E203", # Colons with space before (sometimes useful expand)
-  "E225", # Missing whitespace around operator (sometimes useful to condense)
-  "E501", # Line > 79 chars (we use black)
+  "D107", # missing docstring in __init__ (put in class docstring)
+  "D212", # multi-line docstring start (contradictory)
+  "E203", # clons with space before (sometimes useful expand)
+  "E225", # missing whitespace around operator (sometimes useful to condense)
+  "E501", # line > 79 chars (we use Ruff's formatter)
   "INP001", # missing __init__ -- false positives
   "ISC001", # contradicts Ruff formatter
-
 ]
 unfixable = [
   "RUF100", # Unused noqa (should fix manually)
-
 ]
 flake8-bandit.check-typed-exception = true
 pydocstyle.convention = "google"
-# This probably isn't needed
-# :tyranno: ["${project.name}"]
-#isort.known-first-party = ["cicd"]
 flake8-tidy-imports.ban-relative-imports = "all"
 
 [tool.ruff.per-file-ignores]
 "tests/**/*" = [
   "INP001", # missing __init__
-  "PLR2004", # magic values
+  "PLR2004", # magic value
   "S101", # assert
-  "TID252", # relative imports
-  "S105", # Ignore checks for possible passwords
+  "TID252", # relative import
+  "S105", # possible password
   "S106",
   "S107",
-  "S108", # Harcoded temp file
-
+  "S108", # harcoded temp file
 ]
 
 ###################
 # pytest
 ###################
-#[tool.pytest]  # in a future version of pytest
+#[tool.pytest] # in a future version of pytest
 [tool.pytest.ini_options]
 pythonpath = "./src" # critical!
 # coverage stops recursing after it finds one dir without an __init__.py
@@ -239,9 +217,8 @@ markers = [
   "network: marks tests that require network access (deselect with '-m \"not network\"')"
 ]
 doctest_optionflags = [
-  "DONT_ACCEPT_TRUE_FOR_1", # 1 is not True
+  "DONT_ACCEPT_TRUE_FOR_1", # 1 is not the same as True
   "NORMALIZE_WHITESPACE", # allows us to wrap expected output to 120 lines (ignores newlines)
-
 ]
 
 ###################
@@ -251,7 +228,7 @@ doctest_optionflags = [
 data_file = "coverage.xml"
 branch = true # quantify % coverage of execution branches
 parallel = true # note that pytest-cov overrides this
-# :tyranno: source_pkgs = ["src/${project.name}", "tests"]
+# :tyranno: source_pkgs = ["src/${project.name}"]
 source_pkgs = ["cicd"]
 omit = ["src/**/__main__.py"]
 
@@ -286,13 +263,13 @@ warn_unused_ignores = true
 # Commitizen
 ###################
 [tool.commitizen]
-major_version_zero = true
+major_version_zero = true # when true and vr < 1.0.0, breaking changes bump the minor version.
 annotated_tag = true
 gpg_sign = true
 version_scheme = "semver"
 version_provider = "pep621"
 bump_message = "chore: bump version $current_version → $new_version"
-name = "cz_customize"
+name = "cz_customize" # our custom configuration (see below)
 changelog_incremental = true
 changelog_merge_prerelease = true
 
@@ -301,38 +278,41 @@ example = "feat(i18n): add Japanese translation"
 info = """
 We use [Conventional Commits](https://www.conventionalcommits.org/) with the following types.
 
-| Type        | Label               | Changelog section     | semver | Description                         |
-| ----------- | ------------------- | --------------------- | ------ | ----------------------------------- |
-| `feat:`     | `type: feature`     | `✨ Features`         | minor  | Add or change a feature             |
-| `fix:`      | `type: fix`         | `🐛 Bug fixes`        | patch  | Fix a bug                           |
-| `security:` | `type: security`    | `🔐 Security`         | minor  | Security issue                      |
-| `docs:`     | `type: docs`        | `✏️ Documentation`    | patch  | Add or modify docs or examples      |
-| `build:`    | `type: build`       | `🔧 Build system`     | minor  | Modify build, including Docker      |
-| `perf:`     | `type: performance` | `⚡️ Performance`      | patch  | Increase speed / decrease resources |
-| `test:`     | `type: test`        | `🍒 Miscellaneous`    | N/A    | Add or modify tests               |
-| `refactor:` | `type: refactor`    | `🍒 Miscellaneous`    | N/A    | Refactor source code                |
-| `ci:`       | `type: ci`          | `🍒 Miscellaneous`    | N/A    | Modify CI/CD                        |
-| `style:`    | `type: style`       | ignored               | N/A    | Improve style of source code        |
-| `chore:`    | `type: chore`       | ignored               | N/A    | Change non-source code              |
+| Type           | Label               | Changelog section  | semver | Description                                                         |
+|----------------|---------------------|--------------------|--------|---------------------------------------------------------------------|
+| `feat:`        | `type: feature`     | `✨ Features`       | minor  | Addition or modification of a feature                               |
+| `security:   ` | `type: security`    | `🔒️ Security`     | minor  | Vulnerability fix/mitigation or hardening                           |
+| `deprecation:` | `type: security`    | `🗑️ Deprecation`  | minor  | Deprecation of a feature or API component                           |
+| `fix:`         | `type: fix`         | `🐛 Bug fixes`     | patch  | Bug fix, excluding security vulnerabilities                         |
+| `perf:`        | `type: performance` | `⚡️ Performance`   | patch  | Code change that improves performance                               |
+| `build:`       | `type: build`       | `🔧 Build system`  | minor  | Modify build, including Docker                                      |
+| `docs:`        | `type: docs`        | `✏️ Documentation` | patch  | Add or modify docs or examples                                      |
+| `test:`        | `type: test`        | `🍒 Miscellaneous` | N/A    | Addition or modification of tests                                   |
+| `refactor:`    | `type: refactor`    | `🍒 Miscellaneous` | N/A    | Code change that neither fixes a bug nor adds or modifies a feature |
+| `ci:`          | `type: ci`          | `🍒 Miscellaneous` | N/A    | Change to continuous integration and deployment (CI/CD)             |
+| `style:`       | `type: style`       | ignored            | N/A    | Code change that does not affect the meaning of the code            |
+| `chore:`       | `type: chore`       | ignored            | N/A    | Change that does not modify source, test, or documentation files    |
 """
 
+# The 'bump' type can't be used via commitizen; it's reserved for 'bump' command.
 commit_parser =  """\
 ^\
-(?P<change_type>feat|fix|security|perf|build|docs|test|refactor|ci|style|chore)\
+(?P<change_type>feat|security|deprecation|fix|perf|build|docs|test|refactor|ci|style|chore|bump)\
 (?:\\((?P<scope>[-a-z0-9]+)\\))?\
 (?P<breaking>!)?\
 : (?P<message>[^\n]+)\
 .*\
 """
 
-changelog_pattern = "^(feat|fix|security|perf|build|docs)?(!)?"
+# 'style' and 'chore' are not included in the changelog.
+changelog_pattern = "^(feat|fix|security|perf|build|docs|refactor|test|ci)?(!)?"
 
 schema = """
 <type>[(<scope>)][!]: <subject>
 
 <body>
 
-[BREAKING CHANGE: <breaking>]
+[Breaks: <breaking>]
 [Closes: #<issue>]
 [*: <author>]+
 
@@ -342,13 +322,13 @@ Signed-off-by: <author>
 # See https://lore.kernel.org/git/60ad75ac7ffca_2ae08208b@natae.notmuch/
 schema_pattern = """\
 (?s)"\
-(feat|fix|security|perf|build|docs|test|refactor|ci|style|chore)\
+(feat|security|deprecation|fix|perf|build|docs|refactor|test|ci|style|chore|bump)\
 (?:\\(\\([-a-z0-9]+)\\))?\
 (!)?\
 : ([^\n]+)\
 (?:\
 \n\
-(?:\nBREAKING CHANGE: [^\n]+))?\
+(?:\nBreaks: [^\n]+))?\
 (?:\nCloses: #(\\d+))*\
 (?:\n(Co-authored-by: [^\n]+))*\
 (?:\n((?:\
@@ -365,7 +345,7 @@ message_template = """\
 {% if breaking %}!{% endif %}\
 : {{subject | trim}}\
 \n{{body | trim}}\
-{% if breaking != '' %}\nBREAKING CHANGE: {{breaking | trim}}{% endif %}\
+{% if breaking != '' %}\nBreaks: {{breaking | trim}}{% endif %}\
 {% if issues %}\
 {% set issuelist = issues.split(',') %}\
 {% for issue in issuelist %}\nCloses: #{{issue | trim}}{% endfor %}\
@@ -376,12 +356,15 @@ message_template = """\
 {% endif %}\
 """
 
-bump_pattern = "^(feat|fix|security|perf|build|docs)"
+# 'refactor', 'ci', 'style', 'test', and 'chore' should never trigger a version bump.
+# (However, 'refactor', 'test', and 'ci' are included in the changelog under 'Miscellaneous'.)
+bump_pattern = "^(feat|deprecation|security|fix|perf|build|docs)"
 
 change_type_order = [
   "breaking",
-  "security",
   "feat",
+  "security",
+  "deprecation",
   "fix",
   "perf",
   "build",
@@ -396,20 +379,22 @@ change_type_order = [
 [tool.commitizen.customize.bump_map]
 breaking = "MAJOR"
 feat = "MINOR"
-fix = "PATCH"
 security = "PATCH"
+deprecation = "MINOR"
+fix = "PATCH"
 perf = "PATCH"
 build = "PATCH"
 docs = "PATCH"
 refactor = "PATCH"
 
 [tool.commitizen.customize.change_type_map]
-security = "🔐 Security"
+security = "🔒️ Security"
 feat = "✨ Features"
+deprecation = "✨ Deprecations"
 fix = "🐛 Bug fixes"
 perf = "⚡️ Performance"
 build = "🔧 Build"
-docs = "✏️ Documentation"
+docs = "📝 Documentation"
 refactor = "🍒 Miscellaneous"
 test = "🍒 Miscellaneous"
 
@@ -419,6 +404,7 @@ name = "change_type"
 message = "Select the type of change you are committing"
 choices = [
   {value = "feat", name = "feat: A new feature.", key="f"},
+  {value = "deprecation", name = "deprecation: Deprecation of feature.", key="e"},
   {value = "fix", name = "fix: A bug fix.", key="x"},
   {value = "security", name = "security: An exploit fix.", key="v"},
   {value = "perf", name = "perf: A performance improvement.", key="p"},
@@ -454,7 +440,7 @@ message = "Body. Additional information: (press [enter] to skip)\n"
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "breaking"
-message = "If a breaking change, provide details: (press [enter] to skip)\n"
+message = "If this is a breaking change, list the affected classes, methods, or endpoints: (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
@@ -479,24 +465,31 @@ exclude      = []
 
 #===== Tyranno sync from web =====#
 [tool.tyranno.web]
+# Sync is performed internally after these files are pulled down.
+# That enables us to pull files like SECURITY.md,
+# even though they contain strings specific to this project (e.g. URIs).
 uris = [
+  "https://github.com/dmyersturnbull/tyranno/blob/main/mkdocs.yaml",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/CITATION.cff",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/CONTRIBUTING.md",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/SECURITY.md",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.gitignore",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.dockerignore",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.editorconfig",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.gitattributes",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.prettierignore",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.prettierrc.toml",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.scrutinizer.yaml",
   "https://github.com/dmyersturnbull/tyranno/blob/main/.pre-commit-config.yaml",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/docs/gen_ref_pages.py",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/docs/js/",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/docs/overrides/",
   "https://github.com/dmyersturnbull/suretime/blob/main/.github/dependabot.yaml",
   "https://github.com/dmyersturnbull/suretime/tree/main/.github/workflows/",
   "https://github.com/dmyersturnbull/suretime/tree/main/.github/DISCUSSION_TEMPLATE/",
   "https://github.com/dmyersturnbull/suretime/tree/main/.github/ISSUE_TEMPLATE/",
   "https://github.com/dmyersturnbull/suretime/tree/main/.github/PULL_REQUEST_TEMPLATE/",
 ]
-
-#[[tool.tyranno.web.manual]]
-#path = ""
-#uri = ""
 
 #===== Tyranno auto-add SPDX headers =====#
 [tool.tyranno.headers]
@@ -511,8 +504,10 @@ add            = []
 exclude        = []
 
 #===== Tyranno main data =====#
+# You can add any key-value pairs you want here;
+# they're only referenced by 'tyranno' sync comments
+# No keys here have specific meanings to Tyranno
 [tool.tyranno.data]
-src-dir           = "src"
 vendor            = "dmyersturnbull"
 frag              = "${.vendor}/${project.name}"
 copyright         = "Copyright $2020–${~|year(now_utc())~}, Contributors to ${project.name}"

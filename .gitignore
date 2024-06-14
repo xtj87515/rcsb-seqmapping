@@ -45,6 +45,10 @@ temp/
 *.so
 *.dylib
 
+# IDEs
+
+*.iml
+
 # Python
 env/
 venv/

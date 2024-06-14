@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 """
@@ -6,10 +6,9 @@ Environment variables and internal utils.
 """
 
 import os
+import platformdirs
 from datetime import UTC, datetime
 from pathlib import Path
-
-import platformdirs
 
 __all__ = ["Vars"]
 

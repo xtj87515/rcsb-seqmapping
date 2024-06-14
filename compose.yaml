@@ -23,7 +23,7 @@ services:
     networks:
       - default
   postgres:
-    image: postgres:latest
+    image: postgres:17beta1
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
@@ -39,7 +39,7 @@ services:
     ports:
       - "5432:5432/tcp"
   mongodb:
-    image: mongo:7.0.2
+    image: mongo:8.0.0-rc7
     restart: unless-stopped
     ports:
       - "27017:27017/tcp"
@@ -50,7 +50,7 @@ services:
     networks:
       - default
   elastic:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0
     environment:
       - node.name=elasticsearch
       - cluster.name=elasticsearch

@@ -1,21 +1,19 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 """
 Wrapper around repo for Tyranno.
 """
 
+import jmespath
 import os
+import platformdirs
 import re
+from cicd.wrapped_toml import TomlBranch, TomlLeaf, WrappedToml
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path, PurePath
 from typing import Self
-
-import jmespath
-import platformdirs
-
-from cicd.wrapped_toml import TomlBranch, TomlLeaf, WrappedToml
 
 _PATTERN = re.compile(r"\$\{ *([-._A-Za-z0-9]*) *(?:~ *([^~]+) *~ *)?\}")
 _TEMP_PATH = os.environ.get("TYRANNO_CACHE_DIR", platformdirs.user_cache_path("tyranno"))

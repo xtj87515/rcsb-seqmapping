@@ -1,18 +1,17 @@
-# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to CICD
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 """
 
 """
 
+import httpx
+import orjson
 from datetime import datetime
+from jmespath import functions
 from operator import itemgetter
 from typing import Self
 from zoneinfo import ZoneInfo
-
-import httpx
-import orjson
-from jmespath import functions
 
 NOW_LOCAL = datetime.now().astimezone()
 NOW_UTC = NOW_LOCAL.astimezone(ZoneInfo("Etc/UTC"))

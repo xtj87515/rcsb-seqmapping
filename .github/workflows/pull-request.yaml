@@ -40,8 +40,9 @@ jobs:
         with:
           types: |
             feat
-            fix
             security
+            deprecation
+            fix
             perf
             build
             docs
@@ -60,7 +61,8 @@ jobs:
           message: |
             Please edit your pull request title to follow
             [Conventional Commits specification](https://www.conventionalcommits.org).
-            Use one of the types `fix`, `feat`, `security`, `perf`, `build`, `test`, `refactor`, `ci`, `style`, `chore`.
+            Use one of the following types:
+            `fix`, `feat`, `security`, `deprecation`, `perf`, `build`, `test`, `refactor`, `ci`, `style`, `chore`.
 
             _Details:_
             ```

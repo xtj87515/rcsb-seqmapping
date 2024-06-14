@@ -26,6 +26,7 @@ htmlcov
 site
 .git-blame-ignore-revs
 .git
+.gitattributes
 .ruff_cache
 .pytest_cache
 .gitignore
@@ -39,6 +40,7 @@ CHANGELOG.md
 SECURITY.md
 .scrutinizer.yml
 .scrutinizer.yaml
+.prettierrc*
 codemeta.json
 CITATION.cff
 Vagrantfile
