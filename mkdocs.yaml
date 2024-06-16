@@ -6,7 +6,7 @@
 site_name: "CICD"
 
 # :tyranno: site_name: "${.copyright}"
-copyright: Copyright 2023, Contributors to CICD
+copyright: Copyright 2024, Contributors to CICD
 # :tyranno: site_name: "${project.description}"
 site_description: "CI/CD example"
 
@@ -54,13 +54,6 @@ theme:
         name: Switch to system preference
   # :tyranno: repo_url: ${project.urls.Source}
   repo_url: https://github.com/dmyersturnbull/cicd
-  extra:
-    consent:
-      title: Cookie consent
-      description: >-
-        This site uses cookies to remember your preferences and to enable analytics.
-        Please indicate your consent.
-      actions: [accept, reject, manager]
 
 # Extensions
 markdown_extensions:

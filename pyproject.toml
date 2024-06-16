@@ -68,7 +68,7 @@ Changelog = "https://github.com/dmyersturnbull/cicd/releases"
 # Hatch
 ###################
 [tool.hatch.version]
-path = "src/cicd/__init__.py
+path = "src/cicd/__init__.py"
 
 [tool.hatch.envs.default]
   dependencies = [
@@ -116,7 +116,7 @@ x-serve-docs = "mike serve {args}" # serves all versions of docs, complete with 
 ###################
 [tool.ruff]
 line-length = 120 # 120 is hatch's default via 'hatch init'
-docstring-code-format = true
+
 include = [
   "*.py", # Source
   "*.pyi", # Compiled

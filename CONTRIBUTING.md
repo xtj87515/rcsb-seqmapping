@@ -9,7 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 Please refer to the
 [contributing guide](https://dmyersturnbull.github.io/ref/contributor-guide/),
 [maintainer guide](https://dmyersturnbull.github.io/ref/maintainer-guide/),
-and [coding conventions](https://dmyersturnbull.github.io/ref/coding-conventions/).
+and [coding conventions](https://dmyersturnbull.github.io/conventions/).
 
 To automatically bump the version and deploy, run the <i>bump</i> workflow on GitHub.
 
