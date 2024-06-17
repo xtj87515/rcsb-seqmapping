@@ -1,45 +1,35 @@
-
 changelog:
   exclude:
     labels:
       - 'type: chore'
       - 'type: style'
   categories:
-    breaking:
-      title: '💥 Breaking changes'
+    - title: '💥 Breaking changes'
       labels:
         - 'breaking'
-    deprecation:
-      title: '🗑️ Deprecation'
+    - title: '🗑️ Deprecation'
       labels:
         - 'type: deprecation'
-    security:
-      title: '🔒️ Security'
+    - title: '🔒️ Security'
       labels:
         - 'type: security'
-    features:
-      title: '✨ Features'
+    - title: '✨ Features'
       labels:
         - 'type: feature'
-    fixes:
-        title: '🐛 Fixes'
-        labels:
-            - 'type: fix'
-    performance:
-        title: '⚡️ Performance'
-        labels:
-            - 'type: performance'
-    docs:
-        title: '📝 Documentation'
-        labels:
-            - 'type: docs'
-    build:
-        title: '🔧 Build'
-        labels:
-            - 'type: build'
-    misc:
-        title: '🍒 Miscellaneous'
-        labels:
-            - 'type: refactor'
-            - 'type: test'
-            - 'type: ci'
+    - title: '🐛 Fixes'
+      labels:
+        - 'type: fix'
+    - title: '⚡️ Performance'
+      labels:
+        - 'type: performance'
+    - title: '📝 Documentation'
+      labels:
+        - 'type: docs'
+    - title: '🔧 Build'
+      labels:
+        - 'type: build'
+    - title: '🍒 Miscellaneous'
+      labels:
+        - 'type: refactor'
+        - 'type: test'
+        - 'type: ci'
