@@ -7,7 +7,10 @@ name: Deploy packages
 on:
   push:
     tags:
-      - '^v[0-9]+\.[0-9]+\.[0-9]+(?:[.+-].+)?$'
+      - latest # set by track-tags.yaml
+      - '^v[0-9]+\.[0-9]+\.[0-9](?:[.+-].+)?$'  # match all semver
+      #- '^v[0-9]+\.[1-9][0-9]*\.[0-9](?:[.+-].*)?$' # OR: match only 0.1.0+
+      #- '^v[1-9][0-9]*\.[0-9]+\.[0-9](?:[.+-].*)?$' # OR: match only 1.0.0+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -47,9 +50,11 @@ jobs:
         with:
           name: dist
       - name: Install hatch
-        run: pip install 'hatch~=1.12'
+        run: |
+          pip install hatch~=1.12
       - name: Publish to PyPi
-        run: hatch publish
+        run: |
+          hatch publish
         env:
           HATCH_INDEX_USER: __token__
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
@@ -101,4 +106,6 @@ jobs:
         env:
           TAGS: ${{ steps.docker-meta.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        run: echo "${{ env.TAGS }}" | xargs -I {} cosign sign --yes {}@${{ env.DIGEST }}
+        run: |
+          echo "${{ env.TAGS }}" \
+          | xargs -I {} cosign sign --yes {}@${{ env.DIGEST }}

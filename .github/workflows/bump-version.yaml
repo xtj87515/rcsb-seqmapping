@@ -2,7 +2,9 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: Release
+name: Bump version
+# Manually called workflow that uses Commitizen to bump the version.
+# Adds a commit like 'bump:
 
 on:
   workflow_dispatch:
@@ -33,7 +35,8 @@ jobs:
     steps:
       - name: Set prerelease type from workflow_dispatch
         if: github.event_name == 'workflow_dispatch'
-        run: echo "prerelease=${{ github.event.inputs.prerelease }}" >> $GITHUB_ENV
+        run: |
+          echo "prerelease=${{ github.event.inputs.prerelease }}" >> $GITHUB_ENV
 
       - uses: actions/checkout@v4
 

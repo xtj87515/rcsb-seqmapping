@@ -7,9 +7,10 @@ name: Deploy docs
 on:
   push:
     tags:
-      - latest # always match latest; set by sync-latest-tag.yaml
+      - latest # set by track-tags.yaml
       - '^v[0-9]+\.[0-9]+\.[0-9](?:[.+-].+)?$'  # match all semver
-      #- '^v[1-9][0-9]*\.[0-9]+\.[0-9](?:[.+-].*)?$' # OR: match only major releases
+      #- '^v[0-9]+\.[1-9][0-9]*\.[0-9](?:[.+-].*)?$' # OR: match only 0.1.0+
+      #- '^v[1-9][0-9]*\.[0-9]+\.[0-9](?:[.+-].*)?$' # OR: match only 1.0.0+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -31,7 +32,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install hatch~=1.12
+        run: |
+          pip install hatch~=1.12
       - name: Deploy docs for ${{ github.ref_name }}
         run: |
           hatch run x-deploy-docs ${{ github.ref_name }} --push

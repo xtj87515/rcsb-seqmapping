@@ -1,4 +1,4 @@
-name: Commitizen Check and Associated Issue Verification
+name: Validate PR metadata
 
 on:
   pull_request:
@@ -25,19 +25,16 @@ jobs:
       - name: Install Commitizen
         run: pip install commitizen~=3.27
 
-      - name: Check if comment contains /please-check
+      - name: Check if comment contains /please-check-pr-metadata
         if: github.event_name == 'issue_comment'
         id: check_comment
         run: |
-          if [[ "${{ github.event.comment.body }}" == *"/please-check"* ]]; then
-            echo "Comment contains /please-check"
-          else
-            echo "Comment does not contain /please-check"
-            exit 0
-          fi
+          exit [[ "${{ github.event.comment.body }}" == *"/please-check-pr-metadata"* ]]
 
       - name: Get linked issues for PR
-        if: github.event_name == 'pull_request' || steps.check_comment.outcome == 'success'
+        if: >
+          github.event_name == 'pull_request'
+          || steps.check_comment.outcome == 'success'
         id: get_linked_issues
         run: |
           QUERY='query($repository: String!, $owner: String!, $number: Int!) {
@@ -52,20 +49,32 @@ jobs:
               }
             }
           }'
-          response=$(gh api graphql -f query="$QUERY" -f repository="${{ github.event.repository.name }}" -f owner="${{ github.repository_owner }}" -f number="${{ github.event.pull_request.number }}")
-          echo "$response" | jq '.data.repository.pullRequest.closingIssuesReferences.totalCount' > issue_count.txt
-          echo "$response" | jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' > linked_issues.txt
+          response=$( \
+            gh api graphql \
+              -f query="$QUERY" \
+              -f repository="${{ github.event.repository.name }}" \
+              -f owner="${{ github.repository_owner }}" \
+              -f number="${{ github.event.pull_request.number }}" \
+          )
+          echo "$response" \
+          | jq \
+            --raw-output \
+            -r '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' \
+          > issues.lines
 
       - name: Check for exactly one linked issue
         if: github.event_name == 'pull_request' || steps.check_comment.outcome == 'success'
         run: |
-          issue_count=$(cat issue_count.txt)
+          issue_count=$(wc -l issues.lines)
+          issues=$(cat issues.txt)
           if [[ "$issue_count" -ne 1 ]]; then
-            echo "There must be exactly one linked issue. Found $issue_count."
+            echo "There must be exactly one linked issue. Found $issue_count issues: $issues"
             exit 1
           fi
 
       - name: Validate commit message with Commitizen
-        if: github.event_name == 'pull_request' || steps.check_comment.outcome == 'success'
         run: |
-          commit_message=$(jq -r '.pull_request.title' "$GITHUB_EV
+          commit_message=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
+          commit_body=$(jq -r '.pull_request.body' "$GITHUB_EVENT_PATH")
+          commit_message="$commit_message \n\n$commit_body"
+          echo "$commit_message" | cz check || exit 1

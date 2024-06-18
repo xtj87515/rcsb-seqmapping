@@ -2,13 +2,12 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: Push
+name: Update coverage
 
 on:
   push:
     branches:
       - main
-      - master
       - "releases/**"
 
 permissions:
@@ -24,7 +23,7 @@ concurrency:
 jobs:
   test:
     name: Test
-    uses: ./.github/workflows/test.yaml
+    uses: ./.github/workflows/_test.yaml
     secrets: inherit
 
   send-coverage:
@@ -40,16 +39,16 @@ jobs:
           - "3.12"
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Download coverage artifact for ${{ matrix.os }}/${{ matrix.python }}
+      - name: Download coverage artifact for ${{ matrix.os }}/py${{ matrix.python }}
         uses: actions/download-artifact@v3
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.python }}
-      - name: Send ${{ matrix.os }}/${{ matrix.python }} to coveralls
+      - name: Send ${{ matrix.os }}/py${{ matrix.python }} to coveralls
         uses: coverallsapp/github-action@v2
         with:
-          flag-name: run-${{ join(matrix.*, '-') }}
+          flag-name: run-${{ matrix.os }}-py${{ matrix.python }}
           parallel: true
-      - name: Send ${{ matrix.os }}/${{ matrix.python }} to codecov
+      - name: Send ${{ matrix.os }}/py${{ matrix.python }} to codecov
         uses: codecov/codecov-action@v3
         with:
           env_vars: matrix.os,matrix.python

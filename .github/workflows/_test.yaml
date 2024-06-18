@@ -1,14 +1,6 @@
 name: Test
 
 on:
-  pull_request:
-    types:
-      - ready_for_review
-      - synchronize
-      - edited
-  issue_comment:
-    types:
-      - created
   workflow_call:
     inputs:
       ref:
@@ -23,8 +15,13 @@ permissions:
   security-events: write
 
 jobs:
+
   test-matrix:
-    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.comment.body == '/please-review' ||
+      github.event.comment.body == '/please-run-tests' ||
+      github.event_name == 'workflow_call'
     strategy:
       matrix:
         os:
@@ -32,7 +29,7 @@ jobs:
           - windows-latest
           - macos-latest
         python:
-            - "3.12"
+          - "3.12"
     runs-on: ${{ matrix.os }}
     name: Run tests for ${{ matrix.os }}/py${{ matrix.python }}
     steps:
@@ -44,7 +41,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Test on ${{ matrix.os }}/py${{ matrix.python }}
         run: |
-          pip install hatch
+          pip install hatch~=1.12
           hatch run test
       - name: Store coverage for ${{ matrix.os }}/py${{ matrix.python }}
         uses: actions/upload-artifact@v4
@@ -54,7 +51,11 @@ jobs:
           if-no-files-found: error
 
   test-docker:
-    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.comment.body == '/please-review' ||
+      github.event.comment.body == '/please-check-docker-build' ||
+      github.event_name == 'workflow_call'
     strategy:
       matrix:
         os:
@@ -66,7 +67,7 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref || github.ref }}
       - name: Check for Dockerfile
-        id: check_dockerfile
+        id: check-dockerfile
         run: |
           if [[ -f Dockerfile ]]; then
             echo "Dockerfile exists."
@@ -80,7 +81,11 @@ jobs:
         run: docker build .
 
   codeql:
-    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.comment.body == '/please-review' ||
+      github.event.comment.body == '/please-check-code-quality' ||
+      github.event_name == 'workflow_call'
     name: Analyze with CodeQL
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -96,9 +101,13 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
 
-  bandit:
-    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
-    name: Run Bandit Security Linter
+  security:
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.comment.body == '/please-review' ||
+      github.event.comment.body == '/please-check-security' ||
+      github.event_name == 'workflow_call'
+    name: Run security linters
     runs-on: ubuntu-latest
     steps:
       - name: Check out
@@ -115,7 +124,11 @@ jobs:
           hatch run lint-security
 
   docs:
-    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
+    if: |
+      github.event_name == 'pull_request' ||
+      github.event.comment.body == '/please-review' ||
+      github.event.comment.body == '/please-check-docs' ||
+      github.event_name == 'workflow_call'
     name: Test building docs
     runs-on: ubuntu-latest
     steps:
@@ -130,3 +143,19 @@ jobs:
         run: |
           pip install 'hatch~=1.12'
           hatch run build-docs
+
+  quick-test:
+    if: github.event.comment.body == '/please-check-quickly'
+    name: Quick test on ubuntu-latest/3.12
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Quick test on ubuntu-latest/py3.12
+        run: |
+          pip install hatch~=1.12
+          hatch run test

@@ -8,9 +8,9 @@ on:
   push:
   pull_request:
     types:
-      - opened
-      - reopened
       - ready_for_review
+      - synchronize
+      - edited
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
