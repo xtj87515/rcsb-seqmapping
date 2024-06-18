@@ -4,7 +4,8 @@
 
 name: "✨ Feature"
 description: "Feature request"
-labels: ["type: feature"]
+labels:
+  - "type: feature"
 
 body:
   - type: textarea

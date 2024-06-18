@@ -7,7 +7,7 @@ name: Deploy packages
 on:
   push:
     tags:
-      - '^v[0-9]+\.[0-9]+\.[0-9](?:[.+-].+)?$'
+      - '^v[0-9]+\.[0-9]+\.[0-9]+(?:[.+-].+)?$'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -15,16 +15,13 @@ concurrency:
 
 permissions:
   contents: write
-  # This is used to complete the identity challenge
-  # with sigstore/fulcio when running outside of PRs.
   id-token: write
   packages: write
 
 jobs:
+
   publish-github-release:
     name: Publish GitHub Release
-    needs:
-      - bump
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
@@ -33,40 +30,36 @@ jobs:
           name: dist
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v1
-        #if: ${{ github.ref_type == 'tag' }}
         with:
           draft: false
           generate_release_notes: true
           fail_on_unmatched_files: true
-          token: ${{ github.token }}
+          token: ${{ secrets.github_token }}
           files: dist/*
 
   publish-pypi:
     name: Publish to PyPi
-    needs:
-      - bump
-    runs-on: ${{ os }}
+    needs: bump
+    runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
           name: dist
       - name: Install hatch
-        run: pip install hatch~=1.12
+        run: pip install 'hatch~=1.12'
       - name: Publish to PyPi
         run: hatch publish
         env:
           HATCH_INDEX_USER: __token__
           HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
-        if: ${{ env.pypi_token != '' }}
+        if: ${{ secrets.PYPI_TOKEN != '' }}
 
   publish-docker:
     name: Publish to Docker container registries
-    needs:
-      - bump
-    runs-on: ${{ os }}
+    needs: bump
+    runs-on: ubuntu-latest
     steps:
-      # https://github.com/sigstore/cosign-installer
       - name: Install cosign
         uses: sigstore/cosign-installer@v3
       - name: Download Docker image
@@ -81,43 +74,31 @@ jobs:
         id: docker-meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ GITHUB_REPOSITORY }}
+          images: ${{ github.repository }}
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
-        env:
-          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
         with:
-          username: ${{ env.dockerhub_username }}
-          password: ${{ env.dockerhub_token }}
-        if: ${{ env.dockerhub_username != '' }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+        if: ${{ secrets.DOCKERHUB_USERNAME != '' }}
       - name: Log in to GHCR
         uses: docker/login-action@v3
-        env:
-          ghcr_username: ${{ github.actor }}
-          ghcr_password: ${{ github.token }}
         with:
           registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.github_token }}
       - name: Push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.  If you would like to publish
-      # transparency data even for private images, pass --force to cosign below.
-      # https://github.com/sigstore/cosign
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
         env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
           TAGS: ${{ steps.docker-meta.outputs.tags }}
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        run: echo "${{ env.TAGS }}" | xargs -I {} cosign sign --yes {}@${{ env.DIGEST }}

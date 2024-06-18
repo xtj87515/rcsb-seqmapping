@@ -2,9 +2,10 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-name: "🐢 Performance"
+name: "⚡️ Performance"
 description: "Performance issue"
-labels: ["type: performance"]
+labels:
+  - "type: performance"
 
 body:
   - type: textarea

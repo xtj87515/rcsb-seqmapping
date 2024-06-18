@@ -1,10 +1,14 @@
-# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
-# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
-# SPDX-License-Identifier: Apache-2.0
-
 name: Test
 
 on:
+  pull_request:
+    types:
+      - ready_for_review
+      - synchronize
+      - edited
+  issue_comment:
+    types:
+      - created
   workflow_call:
     inputs:
       ref:
@@ -14,42 +18,30 @@ on:
 
 permissions:
   contents: read
-  statuses: read
+  statuses: write
   actions: read
   security-events: write
 
 jobs:
-
-  check-commit-message:
-    runs-on: ubuntu-latest
-    needs:
-      - send-coverage
-    steps:
-      - name: Run commitizen check
-        id: commitizen-check
-        run: "cz check --message ${{ github.event.head_commit.message }}"
-        # run if this is to the main branch
-        if: ${{ github.ref == 'refs/heads/main' }}
-
   test-matrix:
+    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
     strategy:
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest"
-        # :tyranno: python: ${tool.hatch.envs.all.matrix.python~[0]~}
+          - macos-latest
         python:
-          - "3.12"
+            - "3.12"
     runs-on: ${{ matrix.os }}
     name: Run tests for ${{ matrix.os }}/py${{ matrix.python }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
       - uses: actions/setup-python@v5
         with:
-          python-version: "${{ matrix.python }}"
+          python-version: ${{ matrix.python }}
       - name: Test on ${{ matrix.os }}/py${{ matrix.python }}
         run: |
           pip install hatch
@@ -62,6 +54,7 @@ jobs:
           if-no-files-found: error
 
   test-docker:
+    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
     strategy:
       matrix:
         os:
@@ -71,63 +64,69 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
-      - name: "docker build on ${{ matrix.os }}"
+          ref: ${{ github.event.inputs.ref || github.ref }}
+      - name: Check for Dockerfile
+        id: check_dockerfile
+        run: |
+          if [[ -f Dockerfile ]]; then
+            echo "Dockerfile exists."
+            echo "found=true" >> $GITHUB_ENV
+          else
+            echo "Dockerfile does not exist."
+            echo "found=false" >> $GITHUB_ENV
+          fi
+      - name: Docker build on ${{ matrix.os }}
+        if: env.found == 'true'
         run: docker build .
 
   codeql:
+    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
     name: Analyze with CodeQL
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [python]
+    timeout-minutes: 5
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
-        with:
-          languages: ${{ matrix.language }}
       - name: Autobuild with CodeQL
         uses: github/codeql-action/autobuild@v2
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
-        with:
-          category: "/language:${{matrix.language}}"
 
-  ruff:
-    name: Run Bandit with Ruff
+  bandit:
+    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
+    name: Run Bandit Security Linter
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
-      - name: Set up Python ${{ matrix.python-version }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run Bandit
+      - name: Lint security with Bandit
         run: |
-          pip install hatch
-          hatch run bandit
+          pip install 'hatch~=1.12'
+          hatch run lint-security
 
   docs:
+    if: github.event_name == 'pull_request' || github.event.comment.body == '/please-test' || github.event_name == 'workflow_call'
     name: Test building docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Check out
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref }}
+          ref: ${{ github.event.inputs.ref || github.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Install
         run: |
-          pip install hatch
+          pip install 'hatch~=1.12'
           hatch run build-docs

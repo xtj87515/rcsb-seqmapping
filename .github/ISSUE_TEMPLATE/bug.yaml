@@ -4,7 +4,8 @@
 
 name: "🐛 Bug"
 description: "Bug report"
-labels: ["type: fix"]
+labels:
+  - "type: bug"
 
 body:
   - type: textarea

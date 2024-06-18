@@ -9,39 +9,47 @@ updates:
     directory: /
     commit-message:
       prefix: "build"
-    labels: ["type: build"]
+    labels:
+      - "type: build"
     groups:
       python-main-deps:
-        patterns: ["*"]
+        patterns:
+          - '*'
     schedule:
       interval: weekly
   - package-ecosystem: github-actions
     directory: .github
     commit-message:
       prefix: "ci"
-    labels: ["type: ci"]
+    labels:
+      - "type: cicd"
     groups:
       github-action-deps:
-        patterns: ["*"]
+        patterns:
+          - '*'
     schedule:
       interval: weekly
   - package-ecosystem: docker
     directory: /
     commit-message:
       prefix: "build"
-    labels: ["type: build"]
+    labels:
+      - "type: build"
     groups:
       docker-deps:
-        patterns: ["*"]
+        patterns:
+          - '*'
     schedule:
       interval: weekly
   - package-ecosystem: "npm"
     directory: /
     commit-message:
       prefix: "build"
-    labels: ["type: build"]
+    labels:
+      - "type: build"
     groups:
       npm-main-deps:
-        patterns: ["*"]
+        patterns:
+          - '*'
     schedule:
       interval: weekly

@@ -6,18 +6,18 @@ SPDX-License-Identifier: Apache-2.0
 
 # Contributing
 
-Please refer to the
-[contributing guide](https://dmyersturnbull.github.io/ref/contributor-guide/),
-[maintainer guide](https://dmyersturnbull.github.io/ref/maintainer-guide/),
-and [coding conventions](https://dmyersturnbull.github.io/conventions/).
+Contributions are always welcome.
+Before writing any code, please **open an issue** to discuss the intended change.
+Please only address one issue per PR, and
+[link the PR to the issue](https://docs.github.com/en/github/managing-your-work-on-github/linking-a-pull-request-to-an-issue).
+For example, write `Fixes #123` in the PR description.
 
-To automatically bump the version and deploy, run the <i>bump</i> workflow on GitHub.
+Feel free to open a PR well before it’s complete.
+Just mark it as a draft until it’s ready for review.
 
-Please `npm install`:
+Refer to the the
+[contributing guide](https://dmyersturnbull.github.io/ref/contributor-guide/)
+for more details.
 
-- `prettier-plugin-toml`
-- `prettier-plugin-ini`
-- `prettier-plugin-properties`
-- `prettier-plugin-sh`
-- `prettier-plugin-sql`
-- `@prettier/plugin-xml`
+Maintainers should instead refer to the
+[maintainer guide](https://dmyersturnbull.github.io/ref/maintainer-guide/).

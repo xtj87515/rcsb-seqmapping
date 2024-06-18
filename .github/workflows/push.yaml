@@ -29,13 +29,13 @@ jobs:
 
   send-coverage:
     name: Update coveralls and codecov
+    needs: test
     strategy:
       matrix:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest"
-        # :tyranno: python: ${tool.hatch.envs.all.matrix.python~[0]~}
+          - macos-latest
         python:
           - "3.12"
     runs-on: ${{ matrix.os }}
@@ -54,12 +54,9 @@ jobs:
         with:
           env_vars: matrix.os,matrix.python
           fail_ci_if_error: true
-    needs:
-      - test
 
   finish:
-    needs:
-      - send-coverage
+    needs: send-coverage
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:

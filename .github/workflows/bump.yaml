@@ -5,10 +5,6 @@
 name: Release
 
 on:
-  push:
-    branches:
-      - main
-      - master
   workflow_dispatch:
     inputs:
       prerelease:
@@ -19,7 +15,7 @@ on:
           - alpha
           - beta
           - rc
-          - stable
+          - none
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
@@ -28,29 +24,19 @@ concurrency:
 permissions:
   contents: write
 
-env:
-  prerelease: ${{
-    github.event_name == 'workflow_dispatch' && github.event.inputs.prerelease
-    || github.event.head_commit.message
-    }}
-
 jobs:
   bump:
-    name: Bump version and create changelog with commitizen
-    if: "github.event_name == 'workflow_dispatch' || startsWith(github.event.head_commit.message, 'bump:')"
+    name: Bump version with commitizen
     runs-on: ubuntu-latest
     env:
-      GITHUB_TOKEN: ${{ github.token }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - if: "${{ github.event_name == 'workflow_dispatch' }}"
+      - name: Set prerelease type from workflow_dispatch
+        if: github.event_name == 'workflow_dispatch'
         run: echo "prerelease=${{ github.event.inputs.prerelease }}" >> $GITHUB_ENV
-      - if: "${{ github.event.head_commit.message == 'bump: alpha' }}"
-        run: echo "prerelease=alpha" >> $GITHUB_ENV
-      - if: "${{ github.event.head_commit.message == 'bump: beta' }}"
-        run: echo "prerelease=beta" >> $GITHUB_ENV
-      - if: "${{ github.event.head_commit.message == 'bump: rc' }}"
-        run: echo "prerelease=rc" >> $GITHUB_ENV
+
       - uses: actions/checkout@v4
+
       - name: Import GPG key
         id: gpg
         uses: crazy-max/ghaction-import-gpg@v5
@@ -59,16 +45,18 @@ jobs:
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+
       - id: cz-release
         name: Create bump and changelog
-        uses: commitizen-tools/commitizen-action@master
+        uses: commitizen-tools/commitizen-action@v0.2
         with:
-          github_token: ${{ secrets.PAT }}
+          github_token: ${{ secrets.github_token }}
           git_name: ${{ steps.gpg.outputs.name }}
           git_email: ${{ steps.gpg.outputs.email }}
           gpg_sign: true
-          prerelease: ${{ prerelease }}
-
+          prerelease: ${{ env.prerelease }}
+          changelog: false
           debug: true
+
       - name: Print Version
-        run: echo "Bumped to version ${{ steps.cz.outputs.version }}"
+        run: echo "Bumped to version ${{ steps.cz-release.outputs.version }}"

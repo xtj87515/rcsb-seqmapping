@@ -7,11 +7,14 @@ name: Check links
 on:
   push:
   pull_request:
-    types: [opened, reopened, ready_for_review]
+    types:
+      - opened
+      - reopened
+      - ready_for_review
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: read
@@ -19,9 +22,12 @@ permissions:
 jobs:
   markdown-link-check:
     runs-on: ubuntu-latest
+    name: Run linkspector
     steps:
       - uses: actions/checkout@v4
-      - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      - name: Run linkspector
+        uses: umbrelladocs/action-linkspector@v1
         with:
-          config-file: ".github/markdown-links.json"
-          check-modified-files-only: ${{ github.event_name == 'pull_request' }}
+          github_token: ${{ secrets.github_token }}
+          reporter: github-pr-review
+          fail_on_error: true
