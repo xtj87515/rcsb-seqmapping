@@ -11,9 +11,10 @@ from dataclasses import dataclass
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import metadata as __load
 from pathlib import Path
-from typing import Self
 
-__all__ = ["Metadata"]
+from semver import Version
+
+__all__ = ["ProjectMetadata"]
 
 _pkg = Path(__file__).parent.name
 logger = logging.getLogger(_pkg)
@@ -29,18 +30,6 @@ except PackageNotFoundError:  # nocov
         logger.error(f"Could not load metadata for package {_pkg}. Is it installed?")
 
 
-@dataclass(frozen=True, slots=True, order=True)
-class Version:
-    major: str
-    minor: str
-    patch: str
-    pre: str
-    build: str
-
-    def __eq__(self: Self, other: Self | str) -> bool:
-        return str(self) == str(other)
-
-
 @dataclass(frozen=True, slots=True)
 class _Metadata:
     pkg: str
@@ -48,22 +37,14 @@ class _Metadata:
     title: str
     summary: str
     license: str
-    version: str
-
-    @property
-    def version_major(self: Self) -> str:
-        return self.version.split(".")[0]
-
-    @property
-    def version_minor(self: Self) -> str:
-        return self.version.split(".")[0]
+    version: Version
 
 
-Metadata = _Metadata(
+ProjectMetadata = _Metadata(
     pkg=_pkg,
     homepage=_metadata.get("Home-page"),
-    title = _metadata.get("Name"),
-    summary = _metadata.get("Summary"),
-    license = _metadata.get("License"),
-    version = _metadata.get("Version"),
+    title=_metadata.get("Name"),
+    summary=_metadata.get("Summary"),
+    license=_metadata.get("License"),
+    version=_metadata.get("Version"),
 )

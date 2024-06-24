@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Bump version
+run-name: ${{ github.workflow }} to ${{ github.ref_name }}
 # Manually called workflow that uses Commitizen to bump the version.
 # Adds a commit like 'bump:
 
@@ -27,16 +28,18 @@ permissions:
   contents: write
 
 jobs:
+
   bump:
     name: Bump version with commitizen
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+
       - name: Set prerelease type from workflow_dispatch
         if: github.event_name == 'workflow_dispatch'
         run: |
-          echo "prerelease=${{ github.event.inputs.prerelease }}" >> $GITHUB_ENV
+          echo "prerelease=${{ github.event.inputs.prerelease }}" >> ${GITHUB_ENV}
 
       - uses: actions/checkout@v4
 
@@ -50,7 +53,7 @@ jobs:
           git_commit_gpgsign: true
 
       - id: cz-release
-        name: Create bump and changelog
+        name: Perform bump
         uses: commitizen-tools/commitizen-action@v0.2
         with:
           github_token: ${{ secrets.github_token }}
@@ -61,5 +64,5 @@ jobs:
           changelog: false
           debug: true
 
-      - name: Print Version
+      - name: Print version
         run: echo "Bumped to version ${{ steps.cz-release.outputs.version }}"

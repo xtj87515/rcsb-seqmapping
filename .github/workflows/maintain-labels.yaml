@@ -1,4 +1,5 @@
 name: Maintain labels
+run-name: ${{ github.workflow }} for ${{ github.event.issue.number }} (run=${{ github.run_id }})
 
 on:
   issues:
@@ -13,8 +14,11 @@ on:
       - labeled
 
 jobs:
-  update-labels:
+
+  maintain-labels:
+
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -24,116 +28,35 @@ jobs:
         with:
           token: ${{ secrets.github_token }}
 
-      - name: Add status - awaiting triage to new issues
+      - name: Add status awaiting triage to new issues
         if: github.event.action == 'opened' && github.event.issue
         run: |
           gh issue add-label ${{ github.event.issue.number }} "status: awaiting triage"
 
-      - name: Get current labels
-        if: github.event.action == 'labeled'
-        id: get_labels
+      - name: Remove old status labels when a new one is added
+        if: github.event.action == 'labeled' && github.event.label.name =~ 'status:'
         run: |
-          QUERY='query($repository: String!, $number: Int!) {
-            repository(name: $repository, owner: "OWNER") {
-              issueOrPullRequest(number: $number) {
-                ... on Issue {
-                  labels(first: 100) {
-                    nodes {
-                      name
-                    }
-                  }
-                }
-                ... on PullRequest {
-                  labels(first: 100) {
-                    nodes {
-                      name
-                    }
-                  }
-                }
-              }
-            }
-          }'
-          gh api graphql \
-            -f query="$QUERY" \
-            -f repository="${{ github.repository }}" \
-            -f number="${{ github.event.issue.number || github.event.pull_request.number }}" \
-            --jq '.data.repository.issueOrPullRequest.labels.nodes[].name' \
-          > labels.txt
+          gh issue edit ${{ github.event.issue.number }} \
+            --remove-label "status:ready for dev,status:blocked,status:needs details,status: discarded,status:awaiting triage"
+            --add-label ${{ github.event.label.name }}
 
-      - name: Remove previous type, priority, effort, and status labels
-        if: github.event.action == 'labeled'
-        id: remove_labels
-        run: |
-          labels_to_keep=""
-          while read label; do
-            if [[ "$label" != "type: "* && "$label" != "priority: "* && "$label" != "effort: "* && "$label" != "status: "* ]]; then
-              labels_to_keep="$labels_to_keep -f labels[]=$label"
-            fi
-          done < labels.txt
-          echo "::set-output name=labels_to_keep::$labels_to_keep"
-
-      - name: Add new label
-        if: github.event.action == 'labeled'
-        run: |
-          gh api \
-            --method PUT \
-            -H "Accept: application/vnd.github+json" \
-            /repos\
-              /${{ github.repository }}\
-              /issues/\
-              ${{ github.event.issue.number || github.event.pull_request.number }}\
-              /labels\
-              ${{ steps.remove_labels.outputs.labels_to_keep }} \
-            -f labels[]=${{ github.event.label.name }}
-
-      - name: Close issues with status - discarded
+      - name: Close issues labeld with status discarded
         if: >
           github.event.action == 'labeled'
           && github.event.label.name == 'status: discarded'
-          && github.event.issue"
+          && github.event.issue
         run: >
           gh issue edit \
             ${{ github.event.issue.number }} \
             --state closed \
-            --body "Closed – not planned."
+            --comment "Not planned." \
+            --reason "not_planned"
 
-      - name: Add status - discarded to closed issues
+      - name: Set status to discarded to closed issues
         if: >
           github.event.action == 'closed'
           && github.event.issue.state_reason == 'not_planned'
         run: |
-          gh issue add-label ${{ github.event.issue.number }} "status: discarded"
-
-      - name: Get linked issues for PR
-        if: >
-          github.event.action == 'closed'
-          && github.event.pull_request
-        id: get_linked_issues
-        run: |
-          QUERY='query($repository: String!, $number: Int!) {
-            repository(name: $repository, owner: "OWNER") {
-              pullRequest(number: $number) {
-                closingIssuesReferences(first: 100) {
-                  nodes {
-                    number
-                  }
-                }
-              }
-            }
-          }'
-          gh api graphql \
-            -f query="$QUERY" \
-            -f repository="${{ github.repository }}" \
-            -f number="${{ github.event.pull_request.number }}" \
-            --jq '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' \
-          > linked_issues.txt
-
-      - name: Add status - discarded to linked issues if PR closed as not planned
-        if: |
-          github.event.action == 'closed'
-          && github.event.pull_request.merged == false
-          && github.event.pull_request.state_reason == 'not_planned'
-        run: |
-          while read issue; do
-            gh issue add-label ${issue} "status: discarded"
-          done < linked_issues.txt
+          gh issue edit ${{ github.event.issue.number }} \
+          --remove-label "status:ready for dev,status:blocked,status:needs details,status:awaiting triage" \
+          --add-label "status: discarded"

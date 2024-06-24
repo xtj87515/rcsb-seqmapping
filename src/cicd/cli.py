@@ -7,18 +7,20 @@ CLI for CICD.
 
 from __future__ import annotations
 
+import os
 import sys
-import typer
 from dataclasses import dataclass
-from loguru import logger
 from pathlib import Path
 from typing import Annotated, Self
 
-from cicd._meta import Metadata
-from cicd.context import Context
+import typer
+from loguru import logger
+
+from cicd._project_metadata import ProjectMetadata
+from cicd.context import Context, DefaultContextFactory
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class Messenger:
     success_color: str = typer.colors.GREEN
     error_color: str = typer.colors.RED
@@ -33,12 +35,11 @@ class Messenger:
         typer.echo(typer.style(msg, fg=self.error_color, bold=True))
 
     def write_info(self: Self) -> None:
-        self.info(f"{Metadata.pkg} v{Metadata.version}")
+        self.info(f"{ProjectMetadata.pkg} v{ProjectMetadata.version}")
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True, slots=True, kw_only=True)
 class CliState:
-    dry_run: bool = False
     verbose: bool = False
     quiet: bool = False
 
@@ -71,6 +72,7 @@ class CliCommands:
     @cli.command()
     def new(
         path: Annotated[Path, typer.Argument("name", help="name", exists=False)] = Path.cwd(),
+        *,
         name: Annotated[str, typer.Option(help="Full project name")] = "my-project",
         vendor: Annotated[str, typer.Option(help="vendor")] = "@git.user",
         version: Annotated[str, typer.Option(help="version")] = "0.0.0",
@@ -89,13 +91,14 @@ class CliCommands:
             keywords = []
         if path is None and name is None:
             raise typer.Exit()
-        CliState(verbose=verbose, quiet=quiet, dry_run=dry_run)
+        CliState(verbose=verbose, quiet=quiet)
         typer.echo(f"Done! Created a new repository under {name}")
         Msg.success("See https://dmyersturnbull.github.io/tyranno/guide.html")
 
     @staticmethod
     @cli.command()
     def sync(
+        *,
         dry_run: _Opts.dry_run = False,
         verbose: _Opts.verbose = False,
         quiet: _Opts.quiet = False,
@@ -103,8 +106,8 @@ class CliCommands:
         """
         Sync project metadata between configured files.
         """
-        CliState(verbose=verbose, quiet=quiet, dry_run=dry_run)
-        # context = Context(Path(os.getcwd()), dry_run=state.dry_run)
+        state = CliState(verbose=verbose, quiet=quiet)
+        context = DefaultContextFactory()(Path(os.getcwd()), dry_run=dry_run)
         Msg.info("Syncing metadata...")
         Msg.info("Currently, only targets 'init' and 'recipe' are implemented.")
         # targets = Sync(context).sync()
@@ -113,6 +116,7 @@ class CliCommands:
     @staticmethod
     @cli.command()
     def env(
+        *,
         path: Annotated[Path, typer.Option("environment.yaml", help="Write to this path")] = Path.cwd(),
         name: Annotated[str, typer.Option("${project.name}", help="Name of the environment")] = "environment.yaml",
         dependency_groups: Annotated[list[str] | None, typer.Option([], help="Dependency groups to include")] = None,
@@ -122,18 +126,19 @@ class CliCommands:
     ) -> None:
         if dependency_groups is None:
             dependency_groups = []
-        CliState(verbose=verbose, quiet=quiet, dry_run=dry_run)
+        CliState(verbose=verbose, quiet=quiet)
         typer.echo("Writing environment file...")
         Msg.success(f"Wrote environment file {path}")
 
     @staticmethod
     @cli.command()
     def recipe(
+        *,
         dry_run: _Opts.dry_run = False,
         verbose: _Opts.verbose = False,
         quiet: _Opts.quiet = False,
     ) -> None:
-        CliState(verbose=verbose, quiet=quiet, dry_run=dry_run)
+        CliState(verbose=verbose, quiet=quiet)
 
     @staticmethod
     @cli.command()
@@ -142,7 +147,7 @@ class CliCommands:
         verbose: _Opts.verbose = False,
         quiet: _Opts.quiet = False,
     ) -> None:
-        CliState(verbose=verbose, quiet=quiet, dry_run=dry_run)
+        CliState(verbose=verbose, quiet=quiet)
         Context.this()
 
     @staticmethod
@@ -152,7 +157,7 @@ class CliCommands:
         verbose: _Opts.verbose = False,
         quiet: _Opts.quiet = False,
     ) -> None:
-        CliState(verbose=verbose, quiet=quiet, dry_run=dry_run)
+        CliState(verbose=verbose, quiet=quiet)
         # trashed = Clean(dists, aggressive, hard_delete, dry_run).clean(Path(os.getcwd()))
         # Msg.info(f"Trashed {len(trashed)} paths.")
 

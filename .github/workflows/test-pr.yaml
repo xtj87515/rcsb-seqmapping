@@ -1,4 +1,15 @@
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+# This workflow runs tests for pull requests and issue comments.
+# It is triggered by pull request events (ready for review, synchronize, edited)
+# and issue comments (created).
+# The tests are conditional based on the state of the pull request (not in draft)
+# and specific events.
+
 name: Test PR
+run-name: ${{ github.workflow }} ${{ github.ref_name }}
 
 on:
   pull_request:
@@ -12,8 +23,10 @@ on:
 
 jobs:
   test:
-    name: Test
-    if: |
+    name: Run tests for PR and issue comments
+    # Run tests if the PR is ready for review, synchronized (and not in draft), or edited (and not in draft),
+    # or if an issue comment is created.
+    if: >
       github.event_name == 'pull_request' &&
         github.event.action == 'ready_for_review' ||
       github.event_name == 'pull_request' &&

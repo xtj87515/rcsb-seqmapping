@@ -1,4 +1,5 @@
 name: Validate PR metadata
+run-name: ${{ github.workflow }} on ${{ github.ref_name }}
 
 on:
   pull_request:
@@ -10,10 +11,12 @@ on:
       - created
 
 jobs:
+
   commitizen-check:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -33,8 +36,8 @@ jobs:
 
       - name: Get linked issues for PR
         if: >
-          github.event_name == 'pull_request'
-          || steps.check_comment.outcome == 'success'
+          github.event_name == 'pull_request' ||
+          steps.check_comment.outcome == 'success'
         id: get_linked_issues
         run: |
           QUERY='query($repository: String!, $owner: String!, $number: Int!) {
@@ -51,12 +54,12 @@ jobs:
           }'
           response=$( \
             gh api graphql \
-              -f query="$QUERY" \
+              -f query="${QUERY}" \
               -f repository="${{ github.event.repository.name }}" \
               -f owner="${{ github.repository_owner }}" \
               -f number="${{ github.event.pull_request.number }}" \
           )
-          echo "$response" \
+          echo "${response}" \
           | jq \
             --raw-output \
             -r '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' \
@@ -67,14 +70,14 @@ jobs:
         run: |
           issue_count=$(wc -l issues.lines)
           issues=$(cat issues.txt)
-          if [[ "$issue_count" -ne 1 ]]; then
-            echo "There must be exactly one linked issue. Found $issue_count issues: $issues"
+          if [[ "${issue_count}" -ne 1 ]]; then
+            echo "There must be exactly one linked issue, but found ${issue_count} issues: ${issues}"
             exit 1
           fi
 
       - name: Validate commit message with Commitizen
         run: |
-          commit_message=$(jq -r '.pull_request.title' "$GITHUB_EVENT_PATH")
-          commit_body=$(jq -r '.pull_request.body' "$GITHUB_EVENT_PATH")
-          commit_message="$commit_message \n\n$commit_body"
-          echo "$commit_message" | cz check || exit 1
+          commit_message=$(jq --raw-output '.pull_request.title' "${GITHUB_EVENT_PATH}")
+          commit_body=$(jq --raw-output '.pull_request.body' "${GITHUB_EVENT_PATH}")
+          commit_message="${commit_message}\n\n${commit_body}"
+          echo "${commit_message}" | cz check || exit 1

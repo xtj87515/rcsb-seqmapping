@@ -29,10 +29,10 @@ class Clean:
 
     def _find(self: Self) -> Generator[Path]:
         for pat in self.trash_patterns:
-            yield from self.context.repo_path.glob(pat)
+            yield from self.context.repo_dir.glob(pat)
 
     def _trash(self: Self, source: Path) -> None:
-        dest = self.context.repo_path / source
+        dest = self.context.repo_dir / source
         if not self.dry_run:
             dest.parent.mkdir(exist_ok=True, parents=True)
             shutil.move(str(source), str(dest))

@@ -3,11 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Deploy docs
+run-name: ${{ github.workflow }} for ${{ github.ref_name }}
 
 on:
   push:
     tags:
-      - latest # set by track-tags.yaml
+      # Mike handles the 'latest' tag
       - '^v[0-9]+\.[0-9]+\.[0-9](?:[.+-].+)?$'  # match all semver
       #- '^v[0-9]+\.[1-9][0-9]*\.[0-9](?:[.+-].*)?$' # OR: match only 0.1.0+
       #- '^v[1-9][0-9]*\.[0-9]+\.[0-9](?:[.+-].*)?$' # OR: match only 1.0.0+
@@ -22,7 +23,7 @@ permissions:
   id-token: write
 
 jobs:
-  docs-deploy:
+  deploy-docs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +31,7 @@ jobs:
           ref: ${{ github.ref }}
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
       - name: Install dependencies
         run: |
           pip install hatch~=1.12

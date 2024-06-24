@@ -22,6 +22,7 @@ recipes
 .readthedocs.yml
 mkdocs.yaml
 coverage.xml
+coverage.json
 htmlcov
 site
 .git-blame-ignore-revs

@@ -5,10 +5,11 @@
 CI/CD example.
 """
 
-from cicd._meta import Metadata
+from cicd._project_metadata import ProjectMetadata as __ProjectMetadata
 
-__uri__ = Metadata.homepage
-__title__ = Metadata.title
-__summary__ = Metadata.summary
-__version__ = Metadata.version
-__license__ = Metadata.license
+__metadata__ = __ProjectMetadata
+__uri__ = __ProjectMetadata.homepage
+__title__ = __ProjectMetadata.title
+__summary__ = __ProjectMetadata.summary
+__version__ = __ProjectMetadata.version
+__license__ = __ProjectMetadata.license

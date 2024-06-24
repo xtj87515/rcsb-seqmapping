@@ -98,6 +98,7 @@ clean = "tyranno clean"
 build-docs = "mkdocs build --clean --strict {args}"
 serve-docs = "mkdocs serve --strict {args}"
 format = "ruff format"
+check = ["ruff check --no-fix"]
 lint = [
   "ruff check --fix",
   "mypy --non-interactive {args:src/cicd tests}"
@@ -204,7 +205,13 @@ pythonpath = "./src" # critical!
 # so if it finds src/java-app before src/pyapp, it won't find pyapp
 # So specify exactly which directories to test
 # :tyranno: addopts = "--cov=src/${project.name} --cov-report xml:coverage.xml --cov-report term --cov-config=pyproject.toml"
-addopts = "--cov=src/cicd --cov-report xml:coverage.xml --cov-report term --cov-config=pyproject.toml tests/"
+addopts = """
+  --cov=src/cicd \
+  --cov-report json:coverage.json \
+  --cov-report term \
+  --cov-config=pyproject.toml \
+  tests/
+"""
 # show log output from the tests
 # in the tests/ code, name the logger {pkg}-TEST to differentiate
 log_cli = true
@@ -225,7 +232,7 @@ doctest_optionflags = [
 # coverage
 ###################
 [tool.coverage.run]
-data_file = "coverage.xml"
+data_file = "coverage.json"
 branch = true # quantify % coverage of execution branches
 parallel = true # note that pytest-cov overrides this
 # :tyranno: source_pkgs = ["src/${project.name}"]
@@ -440,7 +447,10 @@ message = "Body. Additional information: (press [enter] to skip)\n"
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "breaking"
-message = "If this is a breaking change, list the affected classes, methods, or endpoints: (press [enter] to skip)\n"
+message = """
+  If this is a breaking change, list the affected classes, methods, or endpoints: \
+  (press [enter] to skip)\n
+"""
 
 [[tool.commitizen.customize.questions]]
 type = "input"
@@ -450,7 +460,12 @@ message = "Closed issues, separated by commas: (press [enter] to skip)\n"
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "trailers"
-message = "Git trailers, separated by '||'. Each must be in the form '<key>: <value>'; e.g., 'Reviewed-by: John Johnson <john@git.com>': (press [enter] to skip)\n"
+message = """
+  Git trailers, separated by '||'. \
+  Each must be in the form '<key>: <value>'; \
+  e.g., 'Reviewed-by: John Johnson <john@git.com>': \
+  (press [enter] to skip)\n
+"""
 
 
 ###################
