@@ -1,5 +1,8 @@
 name: Maintain labels
-run-name: ${{ github.workflow }} for ${{ github.event.issue.number }} (run=${{ github.run_id }})
+run-name: >
+  ${{ github.workflow }}
+  for ${{ github.event.issue.number }}
+  (run=${{ github.run_id }})
 
 on:
   issues:
@@ -28,19 +31,22 @@ jobs:
         with:
           token: ${{ secrets.github_token }}
 
-      - name: Add status awaiting triage to new issues
+      - name: Add state awaiting triage to new issues
         if: github.event.action == 'opened' && github.event.issue
         run: |
-          gh issue add-label ${{ github.event.issue.number }} "state: awaiting triage"
+          gh issue edit \
+            ${{ github.event.issue.number }} \
+            --add-label "state: awaiting triage"
 
       - name: Remove old state labels when a new one is added
         if: github.event.action == 'labeled' && github.event.label.name =~ 'state:'
         run: |
-          gh issue edit ${{ github.event.issue.number }} \
+          gh issue edit \
+            ${{ github.event.issue.number }} \
             --remove-label "state:ready for dev,state:blocked,state:needs details,state: rejected,state:awaiting triage"
             --add-label ${{ github.event.label.name }}
 
-      - name: Close issues labeld with status rejected
+      - name: Close issues labeld with state rejected
         if: >
           github.event.action == 'labeled'
           && github.event.label.name == 'state: rejected'
@@ -52,11 +58,12 @@ jobs:
             --comment "Not planned." \
             --reason "not_planned"
 
-      - name: Set status to rejected to closed issues
+      - name: Set state to rejected to closed issues
         if: >
           github.event.action == 'closed'
           && github.event.issue.state_reason == 'not_planned'
         run: |
-          gh issue edit ${{ github.event.issue.number }} \
-          --remove-label "state:ready for dev,state:blocked,state:needs details,state:awaiting triage" \
-          --add-label "state: rejected"
+          gh issue edit \
+            ${{ github.event.issue.number }} \
+            --remove-label "state:ready for dev,state:blocked,state:needs details,state:awaiting triage" \
+            --add-label "state: rejected"

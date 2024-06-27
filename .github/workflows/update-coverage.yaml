@@ -24,7 +24,9 @@ permissions:
   security-events: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  group: >
+    ${{ github.workflow }}\
+    -${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -81,7 +83,7 @@ jobs:
     # This job sends final data to Coveralls to mark the parallel runs as finished.
     # Will not run if the 'send-to-codecov' job was not cancelled.
     needs: send-to-codecov
-    if: ${{ !cancelled() }}
+    if: !cancelled()
     runs-on: ubuntu-latest
     steps:
       - name: Send final data to Coveralls

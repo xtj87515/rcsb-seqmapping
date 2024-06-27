@@ -5,7 +5,7 @@
 name: Bump version
 run-name: ${{ github.workflow }} to ${{ github.ref_name }}
 # Manually called workflow that uses Commitizen to bump the version.
-# Adds a commit like 'bump:
+# Adds a commit like 'release:
 
 on:
   workflow_dispatch:

@@ -9,7 +9,10 @@
 # such as '/please-review', '/please-run-tests', '/please-check-docker-build', etc.
 
 name: Test
-run-name: ${{ github.workflow }} ${{ github.ref_name }} (triggered by ${{ github.ref_type }})
+run-name: >
+  ${{ github.workflow }} \
+  ${{ github.ref_name }} \
+  (triggered by ${{ github.ref_type }})
 
 on:
   workflow_call:

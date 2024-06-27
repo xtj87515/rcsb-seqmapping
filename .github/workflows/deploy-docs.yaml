@@ -9,9 +9,10 @@ on:
   push:
     tags:
       # Mike handles the 'latest' tag
-      - '^v[0-9]+\.[0-9]+\.[0-9](?:[.+-].+)?$'  # match all semver
-      #- '^v[0-9]+\.[1-9][0-9]*\.[0-9](?:[.+-].*)?$' # OR: match only 0.1.0+
-      #- '^v[1-9][0-9]*\.[0-9]+\.[0-9](?:[.+-].*)?$' # OR: match only 1.0.0+
+      - '^v(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc))?$' # match all semver, including prerelease
+      - '^v(\d+)\.(\d+)\.(\d+)$' # match all non-prerelease semver
+      #- '^v(\d+)\.([1-9]\d*)\.(\d+)$' # OR: match only 0.1.0+ (non-prerelease)
+      #- '^(v[1-9]\d*)\.(\d+)\.(\d+)$' # OR: match only 1.0.0+ (non-prerelease)
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.sha }}
