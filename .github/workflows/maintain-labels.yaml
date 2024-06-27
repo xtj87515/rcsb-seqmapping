@@ -31,19 +31,19 @@ jobs:
       - name: Add status awaiting triage to new issues
         if: github.event.action == 'opened' && github.event.issue
         run: |
-          gh issue add-label ${{ github.event.issue.number }} "status: awaiting triage"
+          gh issue add-label ${{ github.event.issue.number }} "state: awaiting triage"
 
-      - name: Remove old status labels when a new one is added
-        if: github.event.action == 'labeled' && github.event.label.name =~ 'status:'
+      - name: Remove old state labels when a new one is added
+        if: github.event.action == 'labeled' && github.event.label.name =~ 'state:'
         run: |
           gh issue edit ${{ github.event.issue.number }} \
-            --remove-label "status:ready for dev,status:blocked,status:needs details,status: discarded,status:awaiting triage"
+            --remove-label "state:ready for dev,state:blocked,state:needs details,state: rejected,state:awaiting triage"
             --add-label ${{ github.event.label.name }}
 
-      - name: Close issues labeld with status discarded
+      - name: Close issues labeld with status rejected
         if: >
           github.event.action == 'labeled'
-          && github.event.label.name == 'status: discarded'
+          && github.event.label.name == 'state: rejected'
           && github.event.issue
         run: >
           gh issue edit \
@@ -52,11 +52,11 @@ jobs:
             --comment "Not planned." \
             --reason "not_planned"
 
-      - name: Set status to discarded to closed issues
+      - name: Set status to rejected to closed issues
         if: >
           github.event.action == 'closed'
           && github.event.issue.state_reason == 'not_planned'
         run: |
           gh issue edit ${{ github.event.issue.number }} \
-          --remove-label "status:ready for dev,status:blocked,status:needs details,status:awaiting triage" \
-          --add-label "status: discarded"
+          --remove-label "state:ready for dev,state:blocked,state:needs details,state:awaiting triage" \
+          --add-label "state: rejected"

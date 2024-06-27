@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
-SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
-SPDX-License-Identifier: Apache-2.0
--->
-
 # Contributing
 
 Contributions are always welcome.
@@ -15,7 +9,7 @@ For example, write `Fixes #123` in the PR description.
 Feel free to open a PR well before it’s complete.
 Just mark it as a draft until it’s ready for review.
 
-Refer to the the
+Refer to the
 [contributing guide](https://dmyersturnbull.github.io/ref/contributor-guide/)
 for more details.
 

@@ -4,7 +4,8 @@ Commitizen plugin for the Commitizen package.
 Implements a strict syntax for commit messages that narrows the conventional commit standard.
 - Mandates a `!` for breaking changes.
 - Limits trailers to a specific set.
-- Adds trailer types 'Closes' (e.g. `Closes: #32)` and 'Breaks' (e.g. `Breaks: /api/copy endpoint`).
+- Adds trailer types 'Closes' (e.g. `Closes: #32, #44`)
+  and 'BREAKING CHANGE' (e.g. `BREAKING CHANGE: /api/copy endpoint`).
 - Adds extra commit types 'security' and 'deprecation'.
 - Maps commit types to changelog sections and semver changes.
   'test', 'refactor', 'ci' are added to the 'Miscellaneous' section;
@@ -17,11 +18,13 @@ Implements a strict syntax for commit messages that narrows the conventional com
 
 import dataclasses
 import re
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Self
+
 from commitizen.cz.base import BaseCommitizen
 from commitizen.defaults import Questions
 from commitizen.git import GitCommit
-from dataclasses import dataclass
-from typing import Callable, Self
 
 type ChangeHook = Callable[[str, ChangeInfo], str]
 
@@ -70,7 +73,7 @@ class ChangeInfo:
 
     @property
     def issue_links(self: Self) -> dict[str, str]:
-        return {issue: f"/issues/{issue}"for issue in self.issues}
+        return {issue: f"/issues/{issue}" for issue in self.issues}
 
 
 def _format_issues(msg: str, info: ChangeInfo) -> str:
@@ -254,7 +257,7 @@ class CommitizenGenerator:
                 (?P<breaking>!)?\
                 : (?P<subject>[^\n]+)\
                 (?P<body>\n[^\n]+)?\
-                (?P<issues>\nCloses: #\\d+)*\
+                (?P<issues>\nCloses: #\\d+(?:, \\d+)*)\
                 (?P<trailers>\n[A-Za-z-]: [^\n]+)*\
                 """
 
@@ -286,8 +289,8 @@ class CommitizenGenerator:
                 description=match["message"],
                 scope=match["scope"],
                 body=match["body"],
-                issues=[i.strip() for i in match["issues"].splitlines()],
-                trailers=[t.strip() for t in match["trailers"].splitlines()],
+                issues=[i.strip() for i in match["issues"].split(", ")],
+                trailers=[t.strip() for t in match["trailers"].split(", ")],
                 sha1=commit.rev,
                 author=commit.author,
                 author_email=commit.author_email,

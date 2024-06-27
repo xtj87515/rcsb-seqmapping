@@ -6,7 +6,7 @@
 ###################
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling~=1.24.2"]
+requires = ["hatchling~=1.24.0"]
 
 ###################
 # Project
@@ -293,7 +293,7 @@ We use [Conventional Commits](https://www.conventionalcommits.org/) with the fol
 | `fix:`         | `type: fix`         | `🐛 Bug fixes`     | patch  | Bug fix, excluding security vulnerabilities                         |
 | `perf:`        | `type: performance` | `⚡️ Performance`   | patch  | Code change that improves performance                               |
 | `build:`       | `type: build`       | `🔧 Build system`  | minor  | Modify build, including Docker                                      |
-| `docs:`        | `type: docs`        | `✏️ Documentation` | patch  | Add or modify docs or examples                                      |
+| `docs:`        | `type: docs`        | `📝 Documentation` | patch  | Add or modify docs or examples                                      |
 | `test:`        | `type: test`        | `🍒 Miscellaneous` | N/A    | Addition or modification of tests                                   |
 | `refactor:`    | `type: refactor`    | `🍒 Miscellaneous` | N/A    | Code change that neither fixes a bug nor adds or modifies a feature |
 | `ci:`          | `type: ci`          | `🍒 Miscellaneous` | N/A    | Change to continuous integration and deployment (CI/CD)             |
@@ -319,8 +319,8 @@ schema = """
 
 <body>
 
-[Breaks: <breaking>]
-[Closes: #<issue>]
+[BREAKING CHANGE: <breaking>]
+[Closes #<issue> [, #<issue>]*]
 [*: <author>]+
 
 Signed-off-by: <author>
@@ -329,14 +329,14 @@ Signed-off-by: <author>
 # See https://lore.kernel.org/git/60ad75ac7ffca_2ae08208b@natae.notmuch/
 schema_pattern = """\
 (?s)"\
-(feat|security|deprecation|fix|perf|build|docs|refactor|test|ci|style|chore|bump)\
+(drop|feat|security|depr|fix|perf|build|docs|refactor|test|ci|style|chore|release)\
 (?:\\(\\([-a-z0-9]+)\\))?\
 (!)?\
 : ([^\n]+)\
 (?:\
 \n\
-(?:\nBreaks: [^\n]+))?\
-(?:\nCloses: #(\\d+))*\
+(?:\nBREAKING CHANGE: [^\n]+))?\
+(?:\nCloses #(\\d+(?:, \\d+)*))\
 (?:\n(Co-authored-by: [^\n]+))*\
 (?:\n((?:\
   Acked-by|Reviewed-by|Helped-by|Reported-by|Mentored-by|Suggested-by|CC|Noticed-by|Tested-by|Improved-by\
@@ -352,11 +352,8 @@ message_template = """\
 {% if breaking %}!{% endif %}\
 : {{subject | trim}}\
 \n{{body | trim}}\
-{% if breaking != '' %}\nBreaks: {{breaking | trim}}{% endif %}\
-{% if issues %}\
-{% set issuelist = issues.split(',') %}\
-{% for issue in issuelist %}\nCloses: #{{issue | trim}}{% endfor %}\
-{% endif %}\
+{% if breaking %}\nBREAKING CHANGE: {{breaking | trim}}{% endif %}\
+Closes {{issues}}\n\
 {% if trailers %}\
 {% set trailerslist = trailers.split('||') %}\
 {% for trailer in trailerslist %}\n{{trailer | trim}}{% endfor %}\
@@ -365,13 +362,14 @@ message_template = """\
 
 # 'refactor', 'ci', 'style', 'test', and 'chore' should never trigger a version bump.
 # (However, 'refactor', 'test', and 'ci' are included in the changelog under 'Miscellaneous'.)
-bump_pattern = "^(feat|deprecation|security|fix|perf|build|docs)"
+bump_pattern = "^(drop|feat|depr|security|fix|perf|build|docs)"
 
 change_type_order = [
   "breaking",
+  "drop",
   "feat",
   "security",
-  "deprecation",
+  "depr",
   "fix",
   "perf",
   "build",
@@ -385,6 +383,7 @@ change_type_order = [
 
 [tool.commitizen.customize.bump_map]
 breaking = "MAJOR"
+drop = "MAJOR" # redundant -- hopefully these are marked breaking, too
 feat = "MINOR"
 security = "PATCH"
 deprecation = "MINOR"
@@ -397,7 +396,7 @@ refactor = "PATCH"
 [tool.commitizen.customize.change_type_map]
 security = "🔒️ Security"
 feat = "✨ Features"
-deprecation = "✨ Deprecations"
+depr = "✨ Deprecations"
 fix = "🐛 Bug fixes"
 perf = "⚡️ Performance"
 build = "🔧 Build"
@@ -411,7 +410,8 @@ name = "change_type"
 message = "Select the type of change you are committing"
 choices = [
   {value = "feat", name = "feat: A new feature.", key="f"},
-  {value = "deprecation", name = "deprecation: Deprecation of feature.", key="e"},
+  {value = "drop", name = "drop: Remove a feature.", key="x"},
+  {value = "depr", name = "depr: Deprecation of feature.", key="e"},
   {value = "fix", name = "fix: A bug fix.", key="x"},
   {value = "security", name = "security: An exploit fix.", key="v"},
   {value = "perf", name = "perf: A performance improvement.", key="p"},
@@ -419,8 +419,8 @@ choices = [
   {value = "test", name = "test: Add/change tests.", key="t"},
   {value = "docs", name = "docs: A change to documentation.", key="d"},
   {value = "refactor", name = "refactor: A code refactoring.", key="r"},
-  {value = "ci", name = "ci/cd: A change to CI/CD.", key="c"},
-  {value = "style", name = "code style: A change to code style.", key="s"},
+  {value = "ci", name = "ci: A change to CI/CD.", key="c"},
+  {value = "style", name = "style: A change to code style.", key="s"},
   {value = "chore", name = "chore: A change to something non-code.", key="z"},
 ]
 
@@ -455,7 +455,7 @@ message = """
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "issues"
-message = "Closed issues, separated by commas: (press [enter] to skip)\n"
+message = "Closed issues, separated by ', ': (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
@@ -499,11 +499,11 @@ uris = [
   "https://github.com/dmyersturnbull/tyranno/blob/main/docs/gen_ref_pages.py",
   "https://github.com/dmyersturnbull/tyranno/blob/main/docs/js/",
   "https://github.com/dmyersturnbull/tyranno/blob/main/docs/overrides/",
-  "https://github.com/dmyersturnbull/suretime/blob/main/.github/dependabot.yaml",
-  "https://github.com/dmyersturnbull/suretime/tree/main/.github/workflows/",
-  "https://github.com/dmyersturnbull/suretime/tree/main/.github/DISCUSSION_TEMPLATE/",
-  "https://github.com/dmyersturnbull/suretime/tree/main/.github/ISSUE_TEMPLATE/",
-  "https://github.com/dmyersturnbull/suretime/tree/main/.github/PULL_REQUEST_TEMPLATE/",
+  "https://github.com/dmyersturnbull/tyranno/blob/main/.github/dependabot.yaml",
+  "https://github.com/dmyersturnbull/tyranno/tree/main/.github/workflows/",
+  "https://github.com/dmyersturnbull/tyranno/tree/main/.github/DISCUSSION_TEMPLATE/",
+  "https://github.com/dmyersturnbull/tyranno/tree/main/.github/ISSUE_TEMPLATE/",
+  "https://github.com/dmyersturnbull/tyranno/tree/main/.github/PULL_REQUEST_TEMPLATE/",
 ]
 
 #===== Tyranno auto-add SPDX headers =====#
