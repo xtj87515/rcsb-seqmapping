@@ -1,22 +1,29 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
-###################
-# build-system
-###################
+
+#
+###########################################################
+#                     [build-system]
+###########################################################
+
 [build-system]
 build-backend = "hatchling.build"
-requires = ["hatchling~=1.24.0"]
+requires = ["hatchling~=1.25.0"]
 
-###################
-# Project
-###################
+#
+###########################################################
+#                       [project]
+###########################################################
+
 [project]
 name = "cicd"
 version = "0.0.1-alpha0"
 requires-python = "~=3.12"
-readme = { file = "README.md", content-type = "text/markdown" } # 'readme' |--> 'description' in importlib.metadata
-description = "CI/CD test repo" # 'description' |--> 'summary' in importlib.metadata
+# 'readme' |--> 'description' in importlib.metadata
+readme = { file = "README.md", content-type = "text/markdown" }
+# 'description' |--> 'summary' in importlib.metadata
+description = "CI/CD test repo"
 maintainers = [
   { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
 ]
@@ -42,14 +49,20 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-cli = ["typer-slim[standard] >=0.9"]
+cli = [
+  "typer-slim[standard] >=0.9",
+]
 
-#===== Scripts =====#
+#
+#=============== Scripts ===============#
+#
 [project.scripts]
 # :tyranno: ${project.name} = "${project.name}.__main__:cli"
 tyranno = "cicd.__main__:cli"
 
-#===== URLs =====#
+#
+#=============== URLs ===============#
+#
 [project.urls]
 # :tyranno: "https://github.com/${.frag}"
 Homepage = "https://github.com/dmyersturnbull/cicd"
@@ -64,9 +77,11 @@ Download = "https://pypi.org/project/cicd/"
 # :tyranno: "https://github.com/${.frag}/releases"
 Changelog = "https://github.com/dmyersturnbull/cicd/releases"
 
-###################
-# Hatch
-###################
+#
+###########################################################
+#                     [tool.hatch]
+###########################################################
+
 [tool.hatch.version]
 path = "src/cicd/__init__.py"
 
@@ -89,32 +104,60 @@ path = "src/cicd/__init__.py"
     "mkdocs-table-reader-plugin >=2.2",
 ]
 
+#
+#=============== Hatch scripts ===============#
+#
 #skip-install = true
 [tool.hatch.envs.default.scripts]
-prep-dev-env = ["pre-commit install", "tyranno clean"]
+# interactive commit with Commitizen
 commit = "cz commit {args}"
+# 'test' uses args in [tool.pytest] section (you can pass more)
 test = "pytest {args}"
-clean = "tyranno clean"
+# 'clean' removes unnecessary files (always safe to run)
+clean = "tyranno clean {args}"
+# build docs and fail for any warning
 build-docs = "mkdocs build --clean --strict {args}"
-serve-docs = "mkdocs serve --strict {args}"
-format = "ruff format"
-check = ["ruff check --no-fix"]
-lint = [
-  "ruff check --fix",
+# preview docs (only the current version); print out any warnings
+serve-docs = "mkdocs serve {args}"
+# 'format' formats and fixes issues but does not complain
+format = [
+  "ruff format",
+  "ruff check --fix-only",
+]
+# 'check' only checks but never fixes
+check = [
+  "ruff check --no-fix .",
   "mypy --non-interactive {args:src/cicd tests}"
 ]
-lint-security = "ruff check --select S"
-# commands that are normally only run in CI/CD
-x-deploy-docs = "mike deploy {args} latest --update-aliases"
-x-build-changelog = "cz changelog {args}"
-# commands to fix and redeploy docs if they're totally broken
-x-obliterate-docs = "mike delete --all" # deletes all versions of docs from gh-pages for rebuilding
-x-redeploy-docs = "mike deploy {args}" # needed only if the docs were deleted or a prior deployment failed
-x-serve-docs = "mike serve {args}" # serves all versions of docs, complete with version selector
+# only checks with ruff (mypy has a lot of false positives)
+check-ruff = "ruff check --no-fix ."
+# to complement 'check-ruff'
+check-mypy = "mypy --non-interactive {args:src/cicd tests}"
+# only check security via Bandit; we require these rules to pass
+check-security = "ruff check --select S --no-fix ."
 
-###################
-# Ruff
-###################
+#=================== scripts for CI/CD ===================
+# - - - - - - - - -   !! DANGER ZONE   - - - - - - - - - -
+# deploys the **latest** docs to GitHub Pages
+# this will overwrite the 'latest' alias (which is a tag on the GH Pages branch)
+x-deploy-docs = "mike deploy {args} latest --update-aliases"
+
+#=============== scripts for docs with Mike ===============
+# - - - - - - - - -   !! DANGER ZONE   - - - - - - - - - -
+# deletes all versions of docs from gh-pages for rebuilding
+x-obliterate-docs = "mike delete --all"
+# needed only if the docs were deleted or a prior deployment failed
+x-redeploy-docs = "mike deploy --strict {args}"
+# serves all versions of docs, complete with version selector
+x-serve-docs = "mike serve --strict {args}"
+# to have a CHANGELOG.md
+#x-build-changelog = "cz changelog {args}"
+
+#
+###########################################################
+#                       [tool.ruff]
+###########################################################
+
 [tool.ruff]
 line-length = 120 # 120 is hatch's default via 'hatch init'
 
@@ -195,10 +238,12 @@ flake8-tidy-imports.ban-relative-imports = "all"
   "S108", # harcoded temp file
 ]
 
-###################
-# pytest
-###################
-#[tool.pytest] # in a future version of pytest
+#
+###########################################################
+#                      [tool.pytest]
+###########################################################
+
+# A future version of pytest will create [tool.pytest]
 [tool.pytest.ini_options]
 pythonpath = "./src" # critical!
 # coverage stops recursing after it finds one dir without an __init__.py
@@ -228,9 +273,11 @@ doctest_optionflags = [
   "NORMALIZE_WHITESPACE", # allows us to wrap expected output to 120 lines (ignores newlines)
 ]
 
-###################
-# coverage
-###################
+#
+###########################################################
+#                    [tool.coverage]
+###########################################################
+
 [tool.coverage.run]
 data_file = "coverage.json"
 branch = true # quantify % coverage of execution branches
@@ -256,9 +303,11 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-###################
-# MyPy
-###################
+#
+###########################################################
+#                      [tool.mypy]
+###########################################################
+
 [tool.mypy]
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
@@ -266,9 +315,11 @@ pretty = true
 show_column_numbers = true
 warn_unused_ignores = true
 
-###################
-# Commitizen
-###################
+#
+###########################################################
+#                    [tool.commitizen]
+###########################################################
+
 [tool.commitizen]
 major_version_zero = true # when true and vr < 1.0.0, breaking changes bump the minor version.
 annotated_tag = true
@@ -279,6 +330,12 @@ bump_message = "bump: version $current_version → $new_version"
 name = "cz_customize" # our custom configuration (see below)
 changelog_incremental = true
 changelog_merge_prerelease = true
+
+#
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----
+#        [tool.commitizen.customize]
+# This should eventually be turned into a plugin.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----
 
 [tool.commitizen.customize]
 example = "feat(i18n): add Japanese translation"
@@ -467,18 +524,18 @@ message = """
   (press [enter] to skip)\n
 """
 
+#
+###########################################################
+#                     [tool.tyranno]
+###########################################################
 
-###################
-# Tyranno
-###################
-
-#===== Tyranno targets to sync =====#
+#=============== Tyranno targets to sync ===============#
 [tool.tyranno.targets]
 add-defaults = true
 add          = []
 exclude      = []
 
-#===== Tyranno sync from web =====#
+#=============== Tyranno sync from web ===============#
 [tool.tyranno.web]
 # Sync is performed internally after these files are pulled down.
 # That enables us to pull files like SECURITY.md,
@@ -506,28 +563,37 @@ uris = [
   "https://github.com/dmyersturnbull/tyranno/tree/main/.github/PULL_REQUEST_TEMPLATE/",
 ]
 
-#===== Tyranno auto-add SPDX headers =====#
+#=============== Tyranno auto-add SPDX headers ===============#
 [tool.tyranno.headers]
 text = "${.header}"
 add = ["**/*"]
 exclude = []
 
-#===== Tyranno 'clean' command =====#
+#=============== Tyranno 'clean' command ===============#
 [tool.tyranno.trash]
 add-defaults   = true
 add            = []
 exclude        = []
 
-#===== Tyranno main data =====#
+#=============== Tyranno main data ===============#
 # You can add any key-value pairs you want here;
-# they're only referenced by 'tyranno' sync comments
-# No keys here have specific meanings to Tyranno
+# they're only referenced by 'tyranno' sync comments.
+# No keys here have specific meanings.
 [tool.tyranno.data]
 vendor            = "dmyersturnbull"
 frag              = "${.vendor}/${project.name}"
 copyright         = "Copyright $2020–${~|year(now_utc())~}, Contributors to ${project.name}"
+doi               = "10.5281/zenodo.4485186"
 header            = """
 SPDX-FileCopyrightText: ${.copyright}
 SPDX-PackageHomePage: ${project.urls.Homepage}
 SPDX-License-Identifier: Apache-2.0
 """
+# This is the version used in CD and some CI.
+# We could guess from project.requires-python with some JMESPath:
+# ${project.requires-python~.semver_max(@).semver_minor(@)}
+default-python-version = "3.12.3"
+# These are the versions to test in CI.
+# Similarly, we could guess these with:
+# ${project.requires-python~.semver_minor(@)}
+python-versions = ["3.12.3"]

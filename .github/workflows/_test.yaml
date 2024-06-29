@@ -188,7 +188,7 @@ jobs:
         id: bandit
         run: |
           pip install hatch~=1.12
-          hatch run lint-security
+          hatch run check-security
           echo "\
             | **Security checks** \
             | $( [[ $? -eq 0 ]] && echo ✅ || echo ❌ ) \

@@ -4,13 +4,13 @@
 
 build:
   environment:
-    # :tyranno: python: "${.project.requires-python~.semver_max(@)~}"
-    python: "3.12.0"
+    # :tyranno: python: '${.default-python-version}'
+    python: '3.12.3'
   nodes:
     my-tests:
       dependencies:
         before:
-          - "pip install 'hatchling~=1.9'"
+          - "pip install 'hatchling~=1.25'"
     analysis:
 checks:
   python:

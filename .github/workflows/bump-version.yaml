@@ -5,9 +5,10 @@
 name: Bump version
 run-name: ${{ github.workflow }} to ${{ github.ref_name }}
 # Manually called workflow that uses Commitizen to bump the version.
-# Adds a commit like 'release:
+# Adds a commit of type 'release'
 
 on:
+  # `gh workflow run bump-version.yaml --prerelease=${prerelease}
   workflow_dispatch:
     inputs:
       prerelease:
@@ -36,13 +37,7 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
 
-      - name: Set prerelease type from workflow_dispatch
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          echo "prerelease=${{ github.event.inputs.prerelease }}" >> ${GITHUB_ENV}
-
       - uses: actions/checkout@v4
-
       - name: Import GPG key
         id: gpg
         uses: crazy-max/ghaction-import-gpg@v5
@@ -54,13 +49,15 @@ jobs:
 
       - id: cz-release
         name: Perform bump
+        needs:
+          - gpg
         uses: commitizen-tools/commitizen-action@v0.2
         with:
           github_token: ${{ secrets.github_token }}
           git_name: ${{ steps.gpg.outputs.name }}
           git_email: ${{ steps.gpg.outputs.email }}
           gpg_sign: true
-          prerelease: ${{ env.prerelease }}
+          prerelease: ${{ github.event.inputs.prerelease }} # https://github.com/commitizen-tools/commitizen/pull/1162
           changelog: false
           debug: true
 
