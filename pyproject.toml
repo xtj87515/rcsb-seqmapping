@@ -117,7 +117,8 @@ test = "pytest {args}"
 clean = "tyranno clean {args}"
 # build docs and fail for any warning
 build-docs = "mkdocs build --clean --strict {args}"
-# preview docs (only the current version); print out any warnings
+# preview docs (only the current version)
+# also builds, but only prints warnings
 serve-docs = "mkdocs serve {args}"
 # 'format' formats and fixes issues but does not complain
 format = [

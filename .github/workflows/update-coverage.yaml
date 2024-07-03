@@ -63,6 +63,8 @@ jobs:
   send-to-codecov:
     name: Update coveralls and codecov
     needs: test
+    continue-on-error: true
+    #if: !cancelled()
     strategy:
       matrix:
         os:
@@ -81,9 +83,10 @@ jobs:
 
   finalize-codecov-send:
     # This job sends final data to Coveralls to mark the parallel runs as finished.
-    # Will not run if the 'send-to-codecov' job was not cancelled.
+    # Will not run if the 'send-to-codecov' job was not cancelled
     needs: send-to-codecov
-    if: !cancelled()
+    continue-on-error: true
+    #if: !cancelled()
     runs-on: ubuntu-latest
     steps:
       - name: Send final data to Coveralls

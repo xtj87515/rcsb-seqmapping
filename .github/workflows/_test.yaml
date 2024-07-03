@@ -35,8 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run:
-          echo "" >> ${GITHUB_STEP_SUMMARY}
-          echo "| Test | Outcome |\n| --- | --- |" >> ${GITHUB_STEP_SUMMARY}
+          echo "\n| Test | Outcome |\n| --- | --- |" >> ${GITHUB_STEP_SUMMARY}
 
   pytest:
     # This job runs unit tests on multiple operating systems (Ubuntu, Windows, macOS) with Python 3.12.
@@ -72,7 +71,7 @@ jobs:
           hatch run test
           echo "\
             | Pytest on ${os}, Python ${python} \
-            | $( [[ $? -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | $( (( $? == 0 )) && echo ✅ || echo ❌ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
       - name: Upload coverage report
@@ -112,7 +111,7 @@ jobs:
           docker build .
           echo "\
             | **Docker build** on ${os} \
-            | $( [[ $? -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | $( (( $? == 0 )) && echo ✅ || echo ❌ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
 
@@ -150,7 +149,7 @@ jobs:
           v=[[ ${{ steps.ruff.outcome }} == success ]]
           echo "\
             | **Ruff linting** \
-            | $( [[ ${v} -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | $( (( ${v} == 0 )) && echo ✅ || echo ⚠️ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
       - name: Log CodeQL outcome
@@ -158,7 +157,7 @@ jobs:
           v=[[ ${{ steps.codeql.outcome }} == success ]]
           echo "\
             | **CodeQL linting** \
-            | $( [[ ${v} -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | $( (( ${v} == 0 )) && echo ✅ || echo ⚠️ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
 
@@ -191,7 +190,7 @@ jobs:
           hatch run check-security
           echo "\
             | **Security checks** \
-            | $( [[ $? -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | $( (( $? == 0 )) && echo ✅ || echo ❌ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
 
@@ -217,12 +216,19 @@ jobs:
         id: build_docs
         run: |
           pip install hatch~=1.12
-          hatch run build-docs
+          # Use ⚠️ if there were warnings.
+          mkdocs_output=$( hatch run build-docs 2>&1 )
+          emoji=$(
+            (( $? != 0 ))
+            && echo "❌"
+            || ( echo "${mkdocs_output}" | grep --quiet "^WARNING  " && echo"⚠️" || echo "✅" )
+          )
           echo "\
             | **Documentation build** \
-            | $( [[ $? -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | ${emoji} \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
+          echo "${mkdocs_output}"
 
   links:
     # This job runs a link checker (linkspector) to verify that all links in the documentation are valid.
@@ -249,10 +255,10 @@ jobs:
           reporter: ${{ github.event_type == 'schedule' && 'github-check' || 'github-pr-review' }}
       - name: Log
         run: |
-          v=[[ ${{ steps.linkspector.outcome }} == success ]]
+          v=${{ steps.linkspector.outcome }}
           echo "\
-            | Docker build on ${os} \
-            | $( [[ ${v} -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | Markdown links \
+            | $( [[ ${v} == success ]] && echo ✅ || echo ⚠️ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}
 
@@ -276,6 +282,6 @@ jobs:
           hatch run test
           echo "\
             | Pytest on ubuntu-latest, Python 3.12 \
-            | $( [[ $? -eq 0 ]] && echo ✅ || echo ❌ ) \
+            | $( (( $? == 0 )) && echo ✅ || echo ❌ ) \
             |\
           " >> ${GITHUB_STEP_SUMMARY}

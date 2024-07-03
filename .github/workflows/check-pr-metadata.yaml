@@ -30,17 +30,18 @@ jobs:
 
       - name: Check if comment contains /please-check-pr-metadata
         if: github.event_name == 'issue_comment'
-        id: check_comment
+        id: check-comment
         run: |
           exit [[ "${{ github.event.comment.body }}" == *"/please-check-pr-metadata"* ]]
 
       - name: Get linked issues for PR
         if: >
           github.event_name == 'pull_request' ||
-          steps.check_comment.outcome == 'success'
+          steps.check-comment.outcome == 'success'
         id: get_linked_issues
         run: |
-          QUERY='query($repository: String!, $owner: String!, $number: Int!) {
+          QUERY='\
+            query($repository: String!, $owner: String!, $number: Int!) {
             repository(name: $repository, owner: $owner) {
               pullRequest(number: $number) {
                 closingIssuesReferences(first: 100) {
@@ -51,7 +52,8 @@ jobs:
                 }
               }
             }
-          }'
+          }\
+          '
           response=$( \
             gh api graphql \
               -f query="${QUERY}" \
@@ -66,18 +68,137 @@ jobs:
           > issues.lines
 
       - name: Check for exactly one linked issue
-        if: github.event_name == 'pull_request' || steps.check_comment.outcome == 'success'
+        id: check-issue-count
+        if: >
+          github.event_name == 'pull_request' ||
+          steps.check-comment.outcome == 'success'
         run: |
           issue_count=$(wc -l issues.lines)
-          issues=$(cat issues.txt)
-          if [[ "${issue_count}" -ne 1 ]]; then
-            echo "There must be exactly one linked issue, but found ${issue_count} issues: ${issues}"
+          issues=$(cat issues.lines)
+          if (( ${issue_count} == 1 )); then
+            echo "**✅** There is exactly 1 linked issue: ${issues}.\n\n" >> ${GITHUB_STEP_SUMMARY}
+          else
+            Set the status check description
+            echo "fail_msg=There are ${issue_count} != 1 linked issues." >> ${GITHUB_ENV}
+            echo "**❌** There are ${issue_count} != 1 linked issues.\n\n" >> ${GITHUB_STEP_SUMMARY}
             exit 1
           fi
 
-      - name: Validate commit message with Commitizen
+      - name: Get linked issue labels
+        id: get-issue-labels
+        if: success()
+        run: |
+          issue_number=$(cat issues.lines)
+          QUERY='\
+          query($repository: String!, $owner: String!, $number: Int!) {
+            repository(name: $repository, owner: $owner) {
+              issue(number: $number) {
+                labels(first: 100) {
+                  nodes {
+                    name
+                  }
+                }
+              }
+            }
+          }\
+          '
+          response=$( \
+            gh api graphql \
+              -f query="${QUERY}" \
+              -f repository="${{ github.event.repository.name }}" \
+              -f owner="${{ github.repository_owner }}" \
+              -f number="${issue_number}" \
+          )
+          echo "${response}" \
+          | jq \
+            --raw-output \
+            -r '.data.repository.issue.labels.nodes[].name' \
+          > issue-labels.lines
+
+      - name: Get PR labels
+        id: get-pr-labels
+        if: success()
+        run: |
+          response=$( \
+            gh api \
+              repos\
+                /${{ github.repository_owner }}\
+                /${{ github.event.repository.name }}\
+                /issues/${{ github.event.pull_request.number }}\
+                /labels \
+          )
+          echo "${response}" \
+          | jq \
+            --raw-output \
+            -r '.[].name' \
+          > pr-labels.lines
+
+      - name: Check and update PR type label
+        if: success()
+        run: |
+          issue_type_label=$(grep '^type: ' issue-labels.lines || echo "")
+          pr_type_label=$(grep '^type: ' pr-labels.lines || echo "")
+          if [[ "${issue_type_label}" && "${issue_type_label}" == "${pr_type_label}" ]]; then
+            echo "**✅** PR and linked issue share `type: ` label ${issue_type_label}.\n\n" \
+            >> ${GITHUB_STEP_SUMMARY}
+          else
+            # Remove existing type labels from PR
+            for label in $(grep '^type: ' pr_labels.lines); do
+              gh api \
+                --method DELETE \
+                repos/${{ github.repository_owner }}\
+                  /${{ github.event.repository.name }}\
+                  /issues\
+                  /${{ github.event.pull_request.number }}\
+                  /labels\
+                  /${label}
+            done
+            # Add the issue's type label to PR
+            gh api \
+              --method POST \
+                repos/${{ github.repository_owner }}\
+                  /${{ github.event.repository.name }}\
+                  /issues/${{ github.event.pull_request.number }}\
+                  /labels \
+                -f labels="${issue_type_label}"
+            echo "**❗** Corrected PR type label ${pr_type_label} to ${issue_type_label} from linked issue." \
+            >> ${GITHUB_STEP_SUMMARY}
+          fi
+
+      - name: Validate proposed commit message with Commitizen
+        id: validate-commit-message
         run: |
           commit_message=$(jq --raw-output '.pull_request.title' "${GITHUB_EVENT_PATH}")
           commit_body=$(jq --raw-output '.pull_request.body' "${GITHUB_EVENT_PATH}")
           commit_message="${commit_message}\n\n${commit_body}"
-          echo "${commit_message}" | cz check || exit 1
+          cz_output=$(echo "${commit_message}" | cz check 2>&1) && {
+            echo "**✅** The PR title+description meets commit message requirements.\n\n" \
+            >> ${GITHUB_STEP_SUMMARY}
+          } || {
+            echo "fail_msg=The PR title+description do not meet commit message requirements: ${cz_output}" \
+            >> ${GITHUB_ENV}
+            echo "\
+              **❌** The PR title+description does not meet commit message requirements: \
+              \n```\n${cz_output}\n```\n\n" \
+            >> ${GITHUB_STEP_SUMMARY}
+            exit 1
+          }
+
+      - name: Set validation status
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { context, github } = require('@actions/github');
+            const status = context.job === 'success' ? 'success' : 'failure';
+            const description = status === 'success' ?
+              'Validation passed'
+              : 'Validation failed: ' + process.env.fail_msg;
+            await github.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: status,
+              description: status === 'success' ? 'Validation passed' : 'Validation failed',
+              context: 'PR Metadata Validation'
+            });
