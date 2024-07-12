@@ -1,3 +1,9 @@
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+
+# TODO: This workflow may be unnecessary, as well as potentially problematic if synced to Jira.
+
 name: Maintain labels
 run-name: >
   ${{ github.workflow }}

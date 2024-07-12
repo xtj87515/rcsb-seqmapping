@@ -12,9 +12,7 @@ from importlib.metadata import PackageNotFoundError
 from importlib.metadata import metadata as __load
 from pathlib import Path
 
-from semver import Version
-
-__all__ = ["ProjectMetadata"]
+__all__ = ["about"]
 
 _pkg = Path(__file__).parent.name
 logger = logging.getLogger(_pkg)
@@ -37,10 +35,10 @@ class _Metadata:
     title: str
     summary: str
     license: str
-    version: Version
+    version: str
 
 
-ProjectMetadata = _Metadata(
+about = _Metadata(
     pkg=_pkg,
     homepage=_metadata.get("Home-page"),
     title=_metadata.get("Name"),

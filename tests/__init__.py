@@ -1,6 +1,9 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
+# SPDX-License-Identifier: Apache-2.0
 
 """
 Utilities for tests.
@@ -14,7 +17,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path, PurePath
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:

@@ -2,6 +2,6 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
 
-from cicd.cli import cli
+from cicd.tyranno2.cli import cli
 
 cli()

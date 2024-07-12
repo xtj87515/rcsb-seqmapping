@@ -1,6 +1,9 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
 # SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
+# SPDX-License-Identifier: Apache-2.0
 
 # This workflow updates the code coverage reports and sends them to Coveralls and Codecov.
 # It is triggered by pushes to the main branch and release branches.
