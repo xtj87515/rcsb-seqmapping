@@ -101,7 +101,7 @@ path = "src/cicd/__init__.py"
     "coverage[toml] >=7.5",
     "pytest-cov >=5.0",
     "mypy >=1.10",
-    "ruff >=0.4.8",
+    "ruff >=0.5.2",
     "mkdocs >=1.6",
     "mike >=2.1",
     "mkdocs-literate-nav >=0.6",
@@ -173,54 +173,83 @@ x-serve-docs = "mike serve --strict {args}"
 
 [tool.ruff]
 line-length = 120 # 120 is hatch's default via 'hatch init'
+preview = true
+explicit-preview-rules = true
 
 include = [
   "*.py", # Source
-  "*.pyi", # Compiled
   "pyproject.toml", # This file (RUF rules only)
   "*.ipynb" # Jupyter notebooks
 ]
 select = [
   "A", # flake8-builtins
+  #"AIR", # Airflow //DISABLED: enable if using airflow//
   "ANN", # flake8-annotations
+  #"ARG", # flake8-unused-args //DISABLED: correct in overrides//
   "ASYNC", # flake8-async
   "B", # flake8-bugbear
-  "BLE", # flake8-blind-exception
+  #"BLE", # flake8-blind-exception (try: * except: only) //DISABLED: covered by E722 (?)//
   "C", # flake8-comprehensions
-  "COM", # flake8-commas
+  "C4", # flake8-comprehensions
+  #"C90", # mmcabe //DISABLED: useful but thin-lined and time-intensive//
+  #"COM", # flake8-commas //DISABLED: handled by formatter//
+  #"CPY", # flake8-copyright //DISABLED: handle carefully instead; also unmaintained//
+  "D", # pydocstyle
+  #"DJ", # flake8-django //DISABLED: enable if using Django//
   "DTZ", # flake8-datetimez
+  #"E", # pycodestyle ERRORs //DISABLED: almost all handled by formatter//
+  "E502", # redundant backslash
+  "E71", # == None, != False, not in, not is, etc.
+  "E72", # bare except
+  "E73", # lambda assignment
+  "E74", # easily confused characters in names
+  "E9", # can't lint -- syntax error, etc.
   "EM", # flake8-errmsg
+  #"ERA", # eradicate (commented-out code) //DISABLED: catches code in comments, etc.//
+  #"EXE", # flake8-executable //DISABLED: pre-commit shebang rules instead//
   "F", # pyflakes
   "FA", # flake8-future-annotations
-  "E", # flake8 errors (most fixed by black; rest are nitpicky)
-  "G", # flake8-logging-concat
-  "I", # isort
-  "INP", # flake8-no-pep420
+  #"FBT", # flake8-boolean-trap //DISABLED: debatable and sometimes unavoidable//
+  #"FIX", # flake8-fix*me //DISABLED: bans TO*DO, etc. and not configurable//
+  "FLY", # flynt (https://pypi.org/project/flynt/; updates .format)
+  "FURB", # refurb (misc., mostly fixable)
+  #"E", # flake8 errors //DISABLED: handled by formatter or nitpicky//
+  "G", # flake8-logging-format
+  #"I", # isort //DISABLED: handled by formatter//
+  #"ICN", # flake8-import-conventionals //DISABLED: handled by formatter//
+  "INP", # flake8-no-pep420 (require __init__.py to import)
+  "INT", # flake8-gettext (i18n)
   "ISC", # flake8-implicit-str-concat
-  "N", # flake8-naming
-  "NPY", # numpy-specific rules
+  "LOG", # flake8-logging
+  "N", # pep8-naming
+  #"NPY", # numpy-specific rules //DISABLED: enable if using numpy//
+  #"PD",  # pandas-vet //DISABLED: enable if using pandas//
   "PERF", # perflint
   "PGH", # pygrep-hooks
-  "PIE", # flake8-pie
+  "PIE", # flake8-pie (misc. lint rules)
   "PL", # pylint
+  "PT", # flake8-pytest-style
   "PTH", # flake8-use-pathlib
-  "Q", # flake8-quotes
+  #"PYI", # flake8-pyi (rules for stub files) //DISABLED: auto-generate stub files//
+  #"Q", # flake8-quotes //DISABLED: handled by formatter//
+  #"RSE", # flake8-raise //DISABLED: handled by formatter//
+  "RET", # flake8-return (fixable)
   "RUF", # Ruff-specific tests
   "S", # bandit
   "SIM", # flake8-simplify
+  "SLF", # flake8-self (private access)
   "SLOT", # flake8-slots
-  "T10", # debugger
+  "T10", # flake8-debugger (bans debugger)
+  "T20", # flake8-print (bands print and pprint)
+  "TD", # flake8-to*do (mandates syntax; note: use 'to-do' in prose)
   "TCH", # flake8-type-checking
-  "TID", # flake8-tidy-imports (mostly bans relative imports)
+  "TID", # flake8-tidy-imports (bans relative imports)
+  "TRY", # tryceratops (try-except-raise)
   "UP", # pyupgrade
-  "W", # warnings (most fixed by Black, but W605 is invalid escape char)
-  "YTT", # flake8-2020 (unlikely problematic checks for Python version)
+  #"W", # warnings //DISABLED: most fixed by formatter//
+  "W60", # E605 invalid escape character
+  "YTT", # flake8-2020 (incorrect Python vr checks)
   "RUF" # Ruff-specific rules
-]
-exclude = [
-  "ARG", # flake8-unused (unused parameters are almost always intentional, like when overriding)
-  "FBT", # flake8-boolean-trap (debatable, and might not have a choice)
-  "ICN", # flake8-import-conventionals (isort does this)
 ]
 ignore = [
   "COM812", # contradicts Ruff formatter
@@ -231,13 +260,31 @@ ignore = [
   "E501", # line > 79 chars (we use Ruff's formatter)
   "INP001", # missing __init__ -- false positives
   "ISC001", # contradicts Ruff formatter
+  "PLR0912", # too many branches
+  "PLR1711", # return None at end
+  "PLR0916", # too many boolean expressions
+  "PLR2044", # line with empty comment
+  "PLR6301", # 'self' not used -- correct for overrides etc.; and required in
 ]
 unfixable = [
-  "RUF100", # Unused noqa (should fix manually)
+  "F601", # repeated key in dict {}
+  "F602", # repeated key in dict()
+  "F811", # unused and redefined
+  "F841", # unused variable
+  "PGH004", # blanketed noqa
+  "PLE2510", # invalid unescaped characters
+  "RUF100", # unused noqa
+  "SIM112", # uncapitalized env var
+  "TD006", # 'to*do' -> 'TO*DO'
+  "W605", # invalid escape sequence
 ]
 flake8-bandit.check-typed-exception = true
 pydocstyle.convention = "google"
 flake8-tidy-imports.ban-relative-imports = "all"
+
+# TODO: validation error???
+#[tool.ruff.lint.pylint]
+#max-nested-blocks = 3 # default is 5
 
 [tool.ruff.per-file-ignores]
 "tests/**/*" = [
