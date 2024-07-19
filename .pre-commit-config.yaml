@@ -1,12 +1,12 @@
-# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
-# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
 
 # Check out https://pre-commit.com/ for documentation
-minimum_pre_commit_version: 3.5.0
+minimum_pre_commit_version: 3.7.0
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: check-case-conflict
       - id: check-merge-conflict
@@ -25,17 +25,17 @@ repos:
         stages:
           - 'commit-msg'
     repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.13.0
+    rev: v3.28.0
 
   # --- Strip output from .ipynb files ---
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+    rev: 0.7.1
     hooks:
       - id: nbstripout
 
   # --- Linters ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.6
+    rev: v0.5.3
     hooks:
       - id: ruff
         args:
