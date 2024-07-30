@@ -1,11 +1,12 @@
-# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
-# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
 
 name: "⚡️ Performance"
 description: "Performance issue"
 labels:
   - "type: performance"
+  - "state: awaiting triage"
 
 body:
   - type: textarea
@@ -29,8 +30,6 @@ body:
         - Windows
         - Linux
         - macOS
-    validations:
-      required: false
   - type: dropdown
     id: browsers
     attributes:
@@ -43,10 +42,9 @@ body:
         - Safari
         - Opera
         - Samsung Internet
-    validations:
-      required: false
   - type: textarea
     id: logs
     attributes:
       label: Relevant log output
       description: Please copy and paste any relevant log output.
+      render: shell

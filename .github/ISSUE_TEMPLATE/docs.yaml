@@ -1,11 +1,12 @@
-# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
-# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
 
 name: "📚 Documentation"
 description: "Documentation issue"
 labels:
   - "type: docs"
+  - "state: awaiting triage"
 
 body:
   - type: textarea
