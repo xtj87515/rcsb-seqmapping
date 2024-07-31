@@ -9,8 +9,6 @@
 Utilities for tests.
 """
 
-from __future__ import annotations
-
 import contextlib
 import io
 import logging
@@ -22,6 +20,8 @@ from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
     from types import TracebackType
+
+__all__ = ["TestHelper"]
 
 # Separate logging in the main package vs. inside test functions
 logger_name = Path(__file__).parent.parent.name.upper() + ".TEST"
@@ -51,13 +51,13 @@ class Capture(contextlib.ExitStack):
         self._stderr_context = self.enter_context(contextlib.redirect_stderr(self._stderr))
         return self
 
-    def __exit__(self: Self, exc_type: BaseException, exc_value: BaseException, traceback: TracebackType) -> None:
+    def __exit__(self: Self, exc_type: type[BaseException], exc_value: BaseException, traceback: TracebackType) -> None:
         _logger.debug("Finished capturing stdout and stderr")
         # The ExitStack handles everything
         super().__exit__(exc_type, exc_value, traceback)
 
 
-class TestResources:
+class TestHelper:
     """
     A static singleton with utilities for filesystem operations in tests.
     Use `TestResources.resource` to get a file under `tests/resources/`.
@@ -98,6 +98,3 @@ class TestResources:
             The Path `resources`/`<node-1>`/`<node-2>`/.../`<node-n>`
         """
         return Path(__package__, "resources", *nodes).resolve()
-
-
-__all__ = ["TestResources"]
