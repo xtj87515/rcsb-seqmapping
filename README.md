@@ -1,19 +1,110 @@
-# CICD
+<!--
+Render a jagged grid of badges.
+Use line breaks to separate rows, not paragraphs; the latter looks ugly.
+In GitHub-flavored Markdown, do this by ending the line with `\` .
+The `\` are added on separate `:tyranno:` lines for visibility.
+-->
+<!-- :tyranno: [![Version status](https://img.shields.io/pypi/status/${.name}?label=Status)](https://pypi.org/project/${.name}) -->
+<!-- :tyranno: [![Version on PyPi](https://badgen.net/pypi/v/${.name}?label=PyPi -->
+<!-- :tyranno: [![Version on GitHub](https://badgen.net/github/release/${.frag}/stable?label=GitHub)](${.link.repo}/releases) -->
+<!-- :tyranno: [![Version on Docker Hub](https://img.shields.io/docker/v/dmyersturnbull/cicd?color=green&label=Docker%20Hub)](https://hub.docker.com/repository/docker/${.frag})
+               \ -->
+<!-- :tyranno: [![Build (Actions)](https://img.shields.io/github/workflow/status/${T.name}/${.org}/maintest?label=Tests)](${.link.url}/actions) -->
+<!-- :tyranno: [![Coverage (coveralls)](https://badgen.net/coveralls/c/github/${T.name}/${.name}?label=Coveralls)](https://coveralls.io/github/${.frag}?branch=main) -->
+<!-- :tyranno: [![Coverage (codecov)](https://badgen.net/codecov/c/github/${.frag}?label=CodeCov)](https://codecov.io/gh/${.frag})
+               \ -->
+<!-- :tyranno: [![Maintainability (Code Climate)](https://badgen.net/codeclimate/maintainability/${.frag})](https://codeclimate.com/github/${.frag}/maintainability) -->
+<!-- :tyranno: [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/${.frag}/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/${.frag}/?branch=main) -->
+<!-- :tyranno: [![CodeFactor](https://www.codefactor.io/repository/github/${.frag}/badge)](https://www.codefactor.io/repository/github/${.frag})
+               \ -->
+<!-- :tyranno: [![License](https://badgen.net/pypi/license/${.name}?label=License)](${.license.url}) -->
+<!-- :tyranno: [![DOI](https://zenodo.org/badge/DOI/${.doi}.svg)](https://doi.org/${.doi}) -->
+<!-- :tyranno: [![Created with ${.Name}](https://img.shields.io/badge/Created_with-${.Name}-0000ff.svg)](https://github.com/${.frag}) -->
+[![Version status](https://img.shields.io/pypi/status/tyrannosaurus?label=Status)](https://pypi.org/project/tyrannosaurus)
+[![Version on PyPi](https://badgen.net/pypi/v/tyrannosaurus?label=PyPi)](https://pypi.org/project/tyrannosaurus)
+[![Version on GitHub](https://badgen.net/github/release/dmyersturnbull/tyrannosaurus/stable?label=GitHub)](https://github.com/dmyersturnbull/tyrannosaurus/releases)
+[![Version on Docker Hub](https://img.shields.io/docker/v/dmyersturnbull/tyrannosaurus?color=green&label=Docker%20Hub)](https://hub.docker.com/repository/docker/dmyersturnbull/tyrannosaurus)
+[![Build (Actions)](https://img.shields.io/github/actions/workflow/status/dmyersturnbull/tyrannosaurus/push-main.yml?label=Tests)](https://github.com/dmyersturnbull/tyrannosaurus/actions)
+[![Coverage (coveralls)](https://badgen.net/coveralls/c/github/dmyersturnbull/tyrannosaurus?label=Coveralls)](https://coveralls.io/github/dmyersturnbull/tyrannosaurus?branch=main)
+[![Coverage (codecov)](https://badgen.net/codecov/c/github/dmyersturnbull/tyrannosaurus?label=CodeCov)](https://codecov.io/gh/dmyersturnbull/tyrannosaurus)\
+[![Maintainability (Code Climate)](https://badgen.net/codeclimate/maintainability/dmyersturnbull/tyrannosaurus)](https://codeclimate.com/github/dmyersturnbull/tyrannosaurus/maintainability)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dmyersturnbull/tyrannosaurus/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/dmyersturnbull/tyrannosaurus/?branch=main)
+[![CodeFactor](https://www.codefactor.io/repository/github/dmyersturnbull/tyrannosaurus/badge)](https://www.codefactor.io/repository/github/dmyersturnbull/tyrannosaurus)\
+[![License](https://badgen.net/pypi/license/tyrannosaurus?label=License)](https://opensource.org/licenses/Apache-2.0)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4485186.svg)](https://doi.org/10.5281/zenodo.4485186)
+[![Created with Tyrannosaurus](https://img.shields.io/badge/Created_with-Tyrannosaurus-0000ff.svg)](https://github.com/dmyersturnbull/tyrannosaurus)
 
-[![Version status](https://img.shields.io/pypi/status/cicd?label=Status)](https://pypi.org/project/cicd)<!-- :tyranno: [![Version status](https://img.shields.io/pypi/status/${.name}?label=Status)](https://pypi.org/project/${.name}) -->
-[![Version on PyPi](https://badgen.net/pypi/v/cicd?label=PyPi)](https://pypi.org/project/cicd)<!-- :tyranno: [![Version on PyPi](https://badgen.net/pypi/v/${.name}?label=PyPi -->
-[![Version on GitHub](https://badgen.net/github/release/dmyersturnbull/cicd/stable?label=GitHub)](https://github.com/dmyersturnbull/cicd/releases)<!-- :tyranno: [![Version on GitHub](https://badgen.net/github/release/${.frag}/stable?label=GitHub)](${.link.repo}/releases) -->
-[![Version on Docker Hub](https://img.shields.io/docker/v/dmyersturnbull/cicd?color=green&label=Docker%20Hub)](https://hub.docker.com/repository/docker/dmyersturnbull/tyranno)<!-- :tyranno: [![Version on Docker Hub](https://img.shields.io/docker/v/dmyersturnbull/cicd?color=green&label=Docker%20Hub)](https://hub.docker.com/repository/docker/${.frag}) -->
-[![Version on Conda-Forge](https://img.shields.io/conda/vn/conda-forge/cicd?label=Conda-Forge)](https://anaconda.org/conda-forge/tyranno) <!-- :tyranno: [![Version on Conda-Forge](https://img.shields.io/conda/vn/conda-forge/${.name}?label=Conda-Forge)](https://anaconda.org/conda-forge/${T.name}) -->
+# Tyrannosaurus (soon to be v2)
 
-[![Build (Actions)](https://img.shields.io/github/actions/workflow/status/dmyersturnbull/cicd/maintest?label=Tests)](https://github.com/dmyersturnbull/cicd/actions)<!-- :tyranno: [![Build (Actions)](https://img.shields.io/github/workflow/status/${T.name}/${.org}/maintest?label=Tests)](${.link.url}/actions) -->
-[![Documentation status](https://readthedocs.org/projects/cicd/badge)](https://cicd.readthedocs.io/en/stable/)<!-- :tyranno: [![Documentation status](${.link.url}/badge)](${.link.docs}) -->
-[![Coverage (coveralls)](https://badgen.net/coveralls/c/github/dmyersturnbull/cicd?label=Coveralls)](https://coveralls.io/github/dmyersturnbull/cicd?branch=main)<!-- :tyranno: [![Coverage (coveralls)](https://badgen.net/coveralls/c/github/${T.name}/${.name}?label=Coveralls)](https://coveralls.io/github/${.frag}?branch=main) -->
-[![Coverage (codecov)](https://badgen.net/codecov/c/github/dmyersturnbull/cicd?label=CodeCov)](https://codecov.io/gh/dmyersturnbull/cicd) <!-- :tyranno: [![Coverage (codecov)](https://badgen.net/codecov/c/github/${.frag}?label=CodeCov)](https://codecov.io/gh/${.frag})\ -->
-[![Maintainability (Code Climate)](https://badgen.net/codeclimate/maintainability/dmyersturnbull/cicd)](https://codeclimate.com/github/dmyersturnbull/cicd/maintainability)<!-- :tyranno: [![Maintainability (Code Climate)](https://badgen.net/codeclimate/maintainability/${.frag})](https://codeclimate.com/github/${.frag}/maintainability) -->
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/dmyersturnbull/cicd/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/dmyersturnbull/cicd/?branch=main)<!-- :tyranno: [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/${.frag}/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/${.frag}/?branch=main) -->
-[![CodeFactor](https://www.codefactor.io/repository/github/dmyersturnbull/cicd/badge)](https://www.codefactor.io/repository/github/dmyersturnbull/cicd)<!-- :tyranno: [![CodeFactor](https://www.codefactor.io/repository/github/${.frag}/badge)](https://www.codefactor.io/repository/github/${.frag}) -->
+**A template for post-modern Python projects**
+built with
+[Hatch](https://hatch.pypa.io/),
+[mkdocs-material](https://squidfunk.github.io/mkdocs-material/),
+[Ruff](https://github.com/astral-sh/ruff),
+and [GitHub actions](https://docs.github.com/en/actions).
 
-[![License](https://badgen.net/pypi/license/cicd?label=License)](https://opensource.org/licenses/Apache-2.0)<!-- :tyranno: [![License](https://badgen.net/pypi/license/${.name}?label=License)](${.license.url}) -->
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4485186.svg)](https://doi.org/10.5281/zenodo.4485186)<!-- :tyranno: [![DOI](https://zenodo.org/badge/DOI/${.doi}.svg)](https://doi.org/${.doi}) -->
-[![Created with Tyranno](https://img.shields.io/badge/Created_with-Tyranno-0000ff.svg)](https://github.com/dmyersturnbull/cicd)<!-- :tyranno: [![Created with ${.Name}](https://img.shields.io/badge/Created_with-${.Name}-0000ff.svg)](https://github.com/${.frag}) -->
+> [!CAUTION]
+> **🚧 Status:** The GitHub workflows and installable package under construction.
+
+### 🎁 Features
+
+Autoformatting,
+[conventional commits](https://www.conventionalcommits.org/) and
+[autogenerated release notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes),
+deploying to PyPi + container registries + GH Releases + GH Pages,
+reports to [Coveralls](https://coveralls.io/) + [Codecov](https://codecov.io/) + etc.,
+and some [advanced CI/CD workflows](https://github.com/dmyersturnbull/cicd/blob/main/.github/workflows).
+It’s also an installable package that finds `:tyranno:` comments in yaml, toml, Python, etc.
+Want to use your pyproject.toml `project.description` in your readme?
+Use `<!-- :tyranno: ${project.description} -->`
+
+_Everything is optional._
+Not using Docker? Delete `Dockerfile`. The workflows will skip it.
+Don’t want to publish to PyPi? Omit the `PYPI_API_TOKEN` secret.
+Hate all the GitHub workflows? Delete them.
+There’s no magic anywhere. Only standard tools are used, and they’re used in transparent ways.
+Just clone this repo and start modifying as you see fit.
+
+> [!TIP]
+> **Making a repo supporting a scientific publication?**\
+> Tyrannosaurus has a little sister,
+[science-notebook-template 🧪](https://github.com/dmyersturnbull/science-notebook-template).
+
+### 🎨 Another `sync` example
+
+Maybe you want your GitHub workflows to use your `pyproject.toml` Python version.
+Set `default-python-version` and reference it:
+
+```yaml
+- uses: actions/setup-python@v5
+  with:
+    # :tyranno: python-version: '${tool.tyranno.default-python-version}'
+    python-version: '3.12'
+```
+
+**Or**, use a [JMESPath expression](https://jmespath.org/) to
+find the highest value allowed by `project.requires-python = ">=3.9.2,<3.14`:
+
+```yaml
+- uses: actions/setup-python@v5
+  with:
+    # :tyranno: python-version: '${project.requires-python|vr_max(@)|vr_major(@)}'
+    python-version: '3.12'
+```
+
+### 🍁 Contributing
+
+[New issues](https://github.com/dmyersturnbull/cicd/issues) and pull requests are welcome.
+Please refer to the [contributing guide](https://github.com/dmyersturnbull/cicd/blob/master/CONTRIBUTING.md)
+and [security policy](https://github.com/dmyersturnbull/cicd/blob/main/SECURITY.md).
+
+```text
+                    __
+                   / _)
+        _.----._/ /  _ ,
+  .___/        / / = = ,
+:----- | ) - ( |
+       : :   : :
+```
+
+<small>It’s a <s>turtle with arms.</s> <s>dog.</s> <s>misshapen mango?</s> T-rex.</small>
