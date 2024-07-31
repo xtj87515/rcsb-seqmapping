@@ -19,6 +19,7 @@ on:
   pull_request:
     types:
       - opened
+      - reopened
       - closed
       - labeled
 
@@ -29,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Clone repo
         uses: actions/checkout@v4
 
       - name: Set up GitHub CLI

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-License-Identifier: Apache-2.0
+#
 name: Validate PR metadata
 run-name: ${{ github.workflow }} on ${{ github.ref_name }}
 
@@ -17,7 +21,7 @@ jobs:
 
     steps:
 
-      - name: Check out repository
+      - name: Clone repo
         uses: actions/checkout@v4
 
       - name: Set up Python

@@ -4,7 +4,7 @@
 # SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to Tyrannosaurus
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-
+#
 # This workflow automates a software release, deploying packages to four targets.
 # These targets are GitHub releases, PyPi, the GitHub Container Registry, and Docker Hub.
 # Additionally, it updates "moving" tags: "latest", which is always updated, and, e.g., "v1", "v2" for the latest release per major version.
@@ -58,7 +58,7 @@ jobs:
     # This job builds the Hatch distribution artifacts (wheels and sdist).
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Clone repo
         uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -81,7 +81,7 @@ jobs:
     outputs:
       docker_tags: ${{ steps.check-dockerfile.outputs.found }}
     steps:
-      - name: Check out code
+      - name: Clone repo
         uses: actions/checkout@v4
       - name: Check for Dockerfile
         id: check-dockerfile

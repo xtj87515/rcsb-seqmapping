@@ -4,7 +4,7 @@
 # SPDX-FileCopyrightText: Copyright 2020-2023, Contributors to Tyrannosaurus
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-
+#
 # This workflow is designed to run various types of tests and analyses on the codebase.
 # It is triggered from other workflows using `workflow_call`, with specific ref inputs.
 # Different jobs cover tests across multiple operating systems (Ubuntu, Windows, macOS) and Python versions.
@@ -64,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
@@ -104,7 +104,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref }}
       - name: Check for Dockerfile
         id: check-docker
         run: |
@@ -132,10 +132,10 @@ jobs:
     continue-on-error: true
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
+      - name: Clone repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref }}
       - name: Run ruff --no-fix
         id: ruff
         run:
@@ -179,10 +179,10 @@ jobs:
     outputs:
       test_result: ${{ steps.bandit.outcome }}
     steps:
-      - name: Check out code
+      - name: Clone repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -209,10 +209,10 @@ jobs:
     name: Test building docs
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Clone repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -248,7 +248,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Check out code
+      - name: Clone repo
         uses: actions/checkout@v4
       - name: Run linkspector
         id: linkspector
@@ -273,10 +273,10 @@ jobs:
     name: Quick test on Ubuntu, Python 3.12
     runs-on: ubuntu-latest
     steps:
-      - name: Check out code
+      - name: Clone repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.ref || github.ref }}
+          ref: ${{ github.event.inputs.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
