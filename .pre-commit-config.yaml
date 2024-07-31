@@ -35,7 +35,7 @@ repos:
 
   # --- Linters ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.3
+    rev: v0.5.5
     hooks:
       - id: ruff
         args:
