@@ -1,46 +1,17 @@
-# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to CICD
-# SPDX-PackageHomePage: https://github.com/dmyersturnbull/cicd
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-
-# These settings are synced to GitHub by https://probot.github.io/apps/settings/
-
-repository:
-  # See https://developer.github.com/v3/repos/#edit for all available settings.
-
-  # The name of the repository. Changing this will rename the repository
-  # :tyranno: name: ${project.name}
-  name: cicd
-
-  # A short description of the repository that will show up on GitHub
-  # :tyranno: description: ${project.description}
-  description: CI/CD example
-
-  # :tyranno: homepage: ${project.urls.main}
-  homepage: https://github.com/dmyersturnbull/cicd
-
-  # :tyranno: topics: ${project.keywords}
-  topics: ci, cd, ci/cd
-
-  private: false
-
-  has_issues: true
-  has_projects: true
-  has_discussions: true
-  has_downloads: true
-  has_wiki: false
-
-  default_branch: main
-  allow_squash_merge: true
-  allow_merge_commit: true
-  allow_rebase_merge: true
-
-  enable_automated_security_fixes: true
-  enable_vulnerability_alerts: true
-
-# Adapted from https://opensource.creativecommons.org/contributing-code/repo-labels/
-# https://gitmoji.dev/
-# https://seantrane.com/posts/logical-colorful-github-labels-18230/
-# and https://github.com/pvdlg/conventional-changelog-metahub
+#
+# A short description of the repository that will show up on GitHub
+# :tyranno: description: ${project.description}
+description: CI/CD example
+# :tyranno: homepage: ${project.urls.main}
+homepage: https://github.com/dmyersturnbull/cicd
+# :tyranno: topics: ${project.keywords}
+topics:
+  - ci
+  - ci/cd
+#
 labels:
   - name: "breaking"
     description: "💥 Breaking change"
