@@ -11,7 +11,7 @@ on:
   push:
     tags:
       # Mike handles the 'latest' tag
-      - '^v(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|rc))?$' # match all semver, including prerelease
+      - '^v(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|preview|rc))?$' # match all semver, including prerelease
       - '^v(\d+)\.(\d+)\.(\d+)$' # match all non-prerelease semver
       #- '^v(\d+)\.([1-9]\d*)\.(\d+)$' # OR: match only 0.1.0+ (non-prerelease)
       #- '^(v[1-9]\d*)\.(\d+)\.(\d+)$' # OR: match only 1.0.0+ (non-prerelease)
