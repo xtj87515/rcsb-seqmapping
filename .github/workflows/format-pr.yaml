@@ -27,7 +27,7 @@ jobs:
       - name: Run Ruff format
         # Format Python
         run: |
-          pip install 'ruff >=0.5.2'
+          pip install 'ruff >=0.5.5'
           ruff format .
 
       - name: Run Prettier
@@ -58,4 +58,5 @@ jobs:
       - name: Push changes
         if: success() && steps.commit.outputs.commit != ''
         run: |
-          git push origin HEAD:${{ github.ref }} --force
+          # --force should be fine here, too
+          git push origin HEAD:${{ github.ref }} --force-with-lease
