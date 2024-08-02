@@ -4,7 +4,8 @@
 #
 # This workflow automates a software release, deploying packages to four targets.
 # These targets are GitHub releases, PyPi, the GitHub Container Registry, and Docker Hub.
-# Additionally, it updates "moving" tags: "latest", which is always updated, and, e.g., "v1", "v2" for the latest release per major version.
+# Additionally, it updates "moving" tags: "latest", which is always updated,
+# and, e.g., "v1", "v2" for the latest release per major version.
 # The workflow is triggered by pushes of tags matching "latest" or a semver version prefixed by "v".
 # These secrets are needed:
 # DOCKERHUB_USERNAME
@@ -16,7 +17,6 @@
 # - QEMU is set up for cross-platform builds.
 # - Docker Buildx is used for advanced Docker image building and pushing.
 # - Docker metadata action extracts metadata such as tags and labels for the images.
-# - Cosign is used to sign the Docker images to ensure their integrity and authenticity.
 
 name: Deploy packages
 run-name: ${{ github.workflow }} for ${{ github.ref_name }}
@@ -24,9 +24,9 @@ run-name: ${{ github.workflow }} for ${{ github.ref_name }}
 on:
   push:
     tags:
-      # Mike handles the 'latest' tag
+      # Note: Mike (https://pypi.org/project/mike/) handles the 'latest' tag
       - '^v(\d+)\.(\d+)\.(\d+)(?:-(alpha|beta|preview|rc))?$' # match all semver, including prerelease
-      - '^v(\d+)\.(\d+)\.(\d+)$' # match all non-prerelease semver
+      #- '^v(\d+)\.(\d+)\.(\d+)$' # match all non-prerelease semver
       #- '^v(\d+)\.([1-9]\d*)\.(\d+)$' # OR: match only 0.1.0+ (non-prerelease)
       #- '^(v[1-9]\d*)\.(\d+)\.(\d+)$' # OR: match only 1.0.0+ (non-prerelease)
 
@@ -101,9 +101,11 @@ jobs:
         with:
           name: dist
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
-          draft: false
+          # NOTE: This breaks if the tag includes build metadata that contains '-'
+          # Tags really shouldn't include build metadata, only specific files for download (if needed).
+          draft: ${{contains(github.ref_name, '-') }}
           generate_release_notes: true
           fail_on_unmatched_files: true
           token: ${{ secrets.github_token }}
@@ -132,13 +134,8 @@ jobs:
 
   publish-docker:
     name: Publish to Docker container registries
-    needs:
-      - bump
     runs-on: ${{ os }}
     steps:
-      # https://github.com/sigstore/cosign-installer
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3
       - name: Download Docker image
         uses: actions/download-artifact@v4
         with:
@@ -179,27 +176,3 @@ jobs:
           cache-from: type=gha
           # type=gha,mode=max is meant to maximize cache hits.
           cache-to: type=gha,mode=max
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.
-      # To publish transparency data even for private images, pass --force to cosign.
-      # https://github.com/sigstore/cosign
-      - name: Sign the published Docker image
-        env:
-          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
-          TAGS: ${{ steps.docker-meta.outputs.tags }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: |
-          echo "${TAGS}" \
-          | xargs \
-            --replace _ \
-            cosign sign --yes _@${DIGEST}
-
-      #- name: Generate artifact attestation
-      #  uses: actions/attest-build-provenance@v1
-      #  with:
-      #    subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-      #    subject-digest: ${{ steps.push.outputs.digest }}
-      #    push-to-registry: true
