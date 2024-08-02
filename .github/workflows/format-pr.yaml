@@ -36,6 +36,12 @@ jobs:
           npm install --global prettier '>=3.0.0'
           prettier --write .
 
+      # Compress images
+      - name: Compress Images
+        uses: calibreapp/image-actions@v1
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Run pre-commit hooks
         # do not continue on error because we should already be formatted
         # we're mostly checking the other things, like that shebangs are executable
