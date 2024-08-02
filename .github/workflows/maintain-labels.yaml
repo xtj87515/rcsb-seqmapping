@@ -46,7 +46,7 @@ jobs:
             --add-label "state: awaiting triage"
 
       - name: Remove old state labels when a new one is added
-        if: github.event.action == 'labeled' && github.event.label.name =~ 'state:'
+        if: github.event.action == 'labeled' && startsWith(github.event.label.name, 'state:')
         run: |
           gh issue edit \
             ${{ github.event.issue.number }} \
