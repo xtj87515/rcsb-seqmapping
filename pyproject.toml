@@ -667,7 +667,7 @@ frag              = "${.vendor}/${project.name}"
 copyright         = "Copyright ${~|year(now_utc())~}, Contributors to ${project.name}"
 doi               = "10.5281/zenodo.4485186" # <<<comment out for new
 # This is the version used in CD and some CI
-# :tyranno: default-python-version = "${project.requires-python~.semver_max(@).semver_minor(@)}"
+# :tyranno: python-version-in-cicd = "${project.requires-python~.semver_max(@).semver_minor(@)}"
 python-version-in-cicd = "3.12.3"
 # These are the versions to test in CI:
 # :tyranno: python-versions = ${project.requires-python|semver_best_set(@).semver_minor(@)}

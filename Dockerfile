@@ -4,7 +4,7 @@
 
 # https://stackoverflow.com/questions/53835198/integrating-python-poetry-with-docker/54763270#54763270
 
-# :tyranno: FROM python:${.default-python-version.semver_minor(@)~}
+# :tyranno: FROM python:${.python-version-in-cicd.semver_minor(@)~}
 FROM python:3.12
 
 # --------------------------------------
@@ -12,14 +12,14 @@ FROM python:3.12
 
 # See https://github.com/opencontainers/image-spec/blob/master/annotations.md
 # :tyranno: LABEL org.opencontainers.image.version="${project.version}"
-LABEL org.opencontainers.image.version="0.0.1-alpha1"
-# :tyranno: LABEL org.opencontainers.image.vendor="${tool.cicd.data.vendor}"
+LABEL org.opencontainers.image.version="0.0.1-alpha0"
+# :tyranno: LABEL org.opencontainers.image.vendor="${.vendor}"
 LABEL org.opencontainers.image.vendor="dmyersturnbull"
 # :tyranno: LABEL org.opencontainers.image.title="${project.name}"
 LABEL org.opencontainers.image.title="cicd"
-# :tyranno: LABEL org.opencontainers.image.url="${project.urls.homepage}"
+# :tyranno: LABEL org.opencontainers.image.url="${project.urls.Homepage}"
 LABEL org.opencontainers.image.url="https://github.com/dmyersturnbull/cicd"
-# :tyranno: LABEL org.opencontainers.image.documentation="${project.urls.docs}"
+# :tyranno: LABEL org.opencontainers.image.documentation="${project.urls.Documentation}"
 LABEL org.opencontainers.image.documentation="https://github.com/dmyersturnbull/cicd"
 
 # --------------------------------------
@@ -36,7 +36,7 @@ ENV PIP_DEFAULT_TIMEOUT=120
 WORKDIR /app
 COPY . /app/
 
-RUN pip install .[api]
+RUN pip install .
 
 EXPOSE 80
 EXPOSE 443

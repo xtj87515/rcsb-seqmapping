@@ -4,7 +4,7 @@
 
 build:
   environment:
-    # :tyranno: python: '${.default-python-version}'
+    # :tyranno: python: '${.python-version-in-cicd}'
     python: '3.12.3'
   nodes:
     my-tests:

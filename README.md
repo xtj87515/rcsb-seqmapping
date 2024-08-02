@@ -78,7 +78,7 @@ Set `default-python-version` and reference it:
 ```yaml
 - uses: actions/setup-python@v5
   with:
-    # :tyranno: python-version: '${tool.tyranno.default-python-version}'
+    # :tyranno: python-version: '${.python-version-in-cicd}'
     python-version: '3.12'
 ```
 
