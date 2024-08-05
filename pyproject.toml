@@ -103,10 +103,6 @@ Sponsor = "https://${.vendor}.github.io/${project.name}/placeholder#sponsor"
 #                     [tool.hatch]
 ###########################################################
 
-[tool.hatch.version]
-# :tyranno: path = "src/${project.name}/__init__.py"
-path = "src/cicd/__init__.py"
-
 [tool.hatch.envs.default]
   dependencies = [
     "pre-commit >=3.7",
