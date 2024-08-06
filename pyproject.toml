@@ -105,7 +105,7 @@ Sponsor = "https://${.vendor}.github.io/${project.name}/placeholder#sponsor"
 
 [tool.hatch.envs.default]
   dependencies = [
-    "pre-commit >=3.7",
+    "pre-commit >=3.8",
     "hypothesis >=6.100",
     "pytest >=8.2",
     "tzdata >=2024",
@@ -128,7 +128,7 @@ Sponsor = "https://${.vendor}.github.io/${project.name}/placeholder#sponsor"
 #skip-install = true
 [tool.hatch.envs.default.scripts]
 # interactive commit with Commitizen
-commit = "cz commit {args}" # end with -- --signoff
+commit = "cz commit {args}"
 # 'test' uses args in [tool.pytest] section (you can pass more)
 test = "pytest {args}"
 # 'clean' removes unnecessary files (always safe to run)
@@ -144,19 +144,14 @@ format = [
   "ruff check --fix-only",
 ]
 # 'check' only checks but never fixes
-# :tyranno: check = [
-# :tyranno:   "ruff check --no-fix .",
-# :tyranno:   "mypy --non-interactive {args:src/${project.name} tests}"
-# :tyranno: ]
 check = [
   "ruff check --no-fix .",
-  "mypy --non-interactive {args:src/cicd tests}"
+  "mypy --non-interactive src tests
 ]
 # only checks with ruff (mypy has a lot of false positives)
-check-ruff = "ruff check --no-fix ."
+check-ruff = "ruff check --no-fix . {args}"
 # to complement 'check-ruff'
-# :tyranno: mypy --non-interactive {args:src/${project.name} tests}"
-check-mypy = "mypy --non-interactive {args:src/cicd tests}"
+check-mypy = "mypy --non-interactive src tests {args}"
 # only check security via Bandit; we require these rules to pass
 check-security = "ruff check --select S --no-fix ."
 
@@ -383,18 +378,6 @@ exclude_lines = [
 
 #
 ###########################################################
-#                      [tool.mypy]
-###########################################################
-
-[tool.mypy]
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-pretty = true
-show_column_numbers = true
-warn_unused_ignores = true
-
-#
-###########################################################
 #                    [tool.commitizen]
 ###########################################################
 
@@ -411,7 +394,7 @@ changelog_merge_prerelease = true
 
 #
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----
-#        [tool.commitizen.customize].
+#        [tool.commitizen.customize]
 # This should eventually be turned into a plugin.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~----
 
@@ -447,7 +430,7 @@ commit_parser =  """\
 """
 
 # 'style' and 'chore' are not included in the changelog.
-changelog_pattern = "^(feat|fix|security|perf|build|docs|refactor|test|ci)|.+?(!)?"
+changelog_pattern = "^(feat|fix|security|perf|build|docs|refactor|test|ci)?(!)?"
 
 schema = """
 <type>[(<scope>)][!]: <subject>
@@ -463,50 +446,44 @@ Signed-off-by: <author>
 
 # See https://lore.kernel.org/git/60ad75ac7ffca_2ae08208b@natae.notmuch/
 schema_pattern = """\
-^
-(?P<type>drop|feat|security|depr|fix|perf|build|docs|refactor|test|ci|style|chore|release)\
-(?<scope>\\(\\([-a-z0-9]+)\\))?\
-(?P<is_breaking>!)?\
-: (?P<subject>[^\\n]{2,})\
-(?P<body_paragraph>\
-\\n\\n[^\\n]+\
-)*?\
+(?s)"\
+(drop|feat|security|depr|fix|perf|build|docs|refactor|test|ci|style|chore|release)\
+(?:\\(\\([-a-z0-9]+)\\))?\
+(!)?\
+: ([^\n]+)\
 (?:\
-\\n\
-(?:\\nBREAKING CHANGE: (?P<breaking_changes>[^\\n]{2,})))?\
-(?:\\nCloses (?:(?P<issue_1>#[.A-Za-z0-9-]+)(?:, (?P<more_issues>#[.A-Za-z0-9-]+))*))\
-(?:
-\\n(\
-(?P<trailer_key>\
-  |Co-authored-by|Signed-off-by\
-  |Acked-by|Reviewed-by|Helped-by|Reported-by|Mentored-by|Suggested-by|CC|Noticed-by|Tested-by|Improved-by\
-  |Thanks-to|Based-on-patch-by|Contributions-by|Requested-by|Original-patch-by|Inspired-by\
-): \
-(?P<trailer_name>[^<>\\s]+?)\
-(?: <(?P<trailer_email>[^<>@\\s]@[^<>@\\s]+)>)?\
-)*\
+\n\
+(?:\nBREAKING CHANGE: [^\n]+))?\
+(?:\nCloses #(\\d+(?:, \\d+)*))\
+(?:\n(Co-authored-by: [^\n]+))*\
+(?:\n((?:\
+  Acked-by|Reviewed-by|Helped-by|Reported-by|Mentored-by|Suggested-by|CC|Noticed-by|Tested-by|Improved-by\
+  |Thanks-to|Based-on-patch-by|Contributions-by|Co-authored-by|Requested-by|Original-patch-by|Inspired-by\
+): [^\n]+))*\
+(?:\nSigned-off-by: ([^\n]+))*\
 )?\
-$\
 """
 
 message_template = """\
 {{change_type}}\
-{% if scope %}{{scope}}{% endif %}\
+{% if scope %}{{scope | trim}}{% endif %}\
 {% if breaking %}!{% endif %}\
 : {{subject | trim}}\
-{% if body | trim %}\n\n{{body | trim}}{% endif %}\
-{% if breaking or issues or trailers %}\n{% endif %}\
+\n{{body | trim}}\
 {% if breaking %}\nBREAKING CHANGE: {{breaking | trim}}{% endif %}\
-{% if issues | trim %}\nCloses {{issues | trim}}{% endif %}\
-{% set trailer_list = trailers.split('\\n') %}\
-{% for trailer in trailer_list %}\n{{trailer | trim}}{% endfor %}\
+Closes {{issues}}\n\
+{% if trailers %}\
+{% set trailerslist = trailers.split('||') %}\
+{% for trailer in trailerslist %}\n{{trailer | trim}}{% endfor %}\
+{% endif %}\
 """
 
-# 'refactor', 'test', 'ci', 'style', and 'chore' should never trigger a version bump.
+# 'refactor', 'ci', 'style', 'test', and 'chore' should never trigger a version bump.
 # (However, 'refactor', 'test', and 'ci' are included in the changelog under 'Miscellaneous'.)
-bump_pattern = "^(drop|feat|security|depr|fix|perf|build|docs)"
+bump_pattern = "^(drop|feat|depr|security|fix|perf|build|docs)"
 
 change_type_order = [
+  "breaking",
   "drop",
   "feat",
   "security",
@@ -548,66 +525,66 @@ test = "🍒 Miscellaneous"
 [[tool.commitizen.customize.questions]]
 type = "list"
 name = "change_type"
-message = "Type of change\n>"
+message = "Select the type of change you are committing"
 choices = [
-  {value = "feat", name = "feat: add or modify a feature", key="f"},
-  {value = "drop", name = "drop: remove a feature or API component", key="x"},
-  {value = "depr", name = "depr: deprecate a feature or API component", key="w"},
-  {value = "fix", name = "fix: resolve a bug", key="x"},
-  {value = "security", name = "security: patch a vulnerability or harden something", key="v"},
-  {value = "perf", name = "perf: increase speed or decrease resource usage", key="p"},
-  {value = "build", name = "build: add or modify the build process", key="b"},
-  {value = "test", name = "test: add or modify tests", key="t"},
-  {value = "docs", name = "docs: add or modify documentation", key="d"},
-  {value = "refactor", name = "refactor: restructure some code without altering any logic", key="r"},
-  {value = "ci", name = "ci: add or modify the CI/CD workflows", key="c"},
-  {value = "style", name = "style: format some code to improve readability", key="s"},
-  {value = "chore", name = "chore: make a miscellaneous non-code change", key="z"},
+  {value = "feat", name = "feat: A new feature.", key="f"},
+  {value = "drop", name = "drop: Remove a feature.", key="x"},
+  {value = "depr", name = "depr: Deprecation of feature.", key="e"},
+  {value = "fix", name = "fix: A bug fix.", key="x"},
+  {value = "security", name = "security: An exploit fix.", key="v"},
+  {value = "perf", name = "perf: A performance improvement.", key="p"},
+  {value = "build", name = "build: A build system change.", key="b"},
+  {value = "test", name = "test: Add/change tests.", key="t"},
+  {value = "docs", name = "docs: A change to documentation.", key="d"},
+  {value = "refactor", name = "refactor: A code refactoring.", key="r"},
+  {value = "ci", name = "ci: A change to CI/CD.", key="c"},
+  {value = "style", name = "style: A change to code style.", key="s"},
+  {value = "chore", name = "chore: A change to something non-code.", key="z"},
 ]
-qmark = "[Q]"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "subject"
-message = "Subject (e.g. 'fix typos in API')\n>"
-qmark = "[Q]"
+message = "A short, imperative summary: (lowercase and no period).\n"
 
 [[tool.commitizen.customize.questions]]
 type = "list"
 name = "scope"
-message = "Optional scope\n>"
+message = "Scope (press [enter] to skip).\n"
 choices = [
   {value = "", name = "[none]"},
-  {value = "i18n", name = "i18n"},
-  {value = "plugins", name = "plugins"}
+  {value = "i18n", name = "i18n: Internationalization."},
+  {value = "plugins", name = "plugins: Plugins."}
 ]
-qmark = "[Q]"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "body"
-message = "Optional body (e.g. 'Correct serious error [...]')\n>"
-multiline = true
-qmark = "[Q]"
+message = "Body. Additional information: (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "breaking"
-message = "Breaking changes (e.g. 'drop /api/factor endpoint.')\n>"
-qmark = "[Q]"
+message = """
+  If this is a breaking change, list the affected classes, methods, or endpoints: \
+  (press [enter] to skip)\n
+"""
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "issues"
-message = "Closed issues (e.g. '#12, #13')\n>"
-qmark = "[Q]"
+message = "Closed issues, separated by ', ': (press [enter] to skip)\n"
 
 [[tool.commitizen.customize.questions]]
 type = "input"
 name = "trailers"
-message = "Git trailers (e.g. 'Acked-by: Jon Dale <jon@dev.org>')\n>"
-multiline = true
-qmark = "[Q]"
+message = """
+  Git trailers, separated by '||'. \
+  Each must be in the form '<key>: <value>'; \
+  e.g., 'Reviewed-by: John Johnson <john@git.com>': \
+  (press [enter] to skip)\n
+"""
+
 
 #
 ###########################################################
@@ -616,13 +593,12 @@ qmark = "[Q]"
 
 [tool.tyranno]
 
-# perform sync on these files
 target_globs = [
-  "pyproject.toml", "/.github/**/*.yaml",
-  "src/**/*.py", "test/**/*.py", "/*.md",
+  "pyproject.toml", ".github/**/*.yaml",
+  "src/**/*.py", "tests/**/*.py", "*.md",
 ]
 
-trash_globs = ["*~", "*.bak", "*.temp", "*.tmp", "*.pyi", "/build/"]
+trash_globs = ["**/*~", "**/*.bak", "**/*.temp", "**/*.tmp", "**/*.pyi", "build/"]
 
 #=============== Tyranno sync from web ===============#
 [tool.tyranno.fetch]
