@@ -68,7 +68,7 @@ jobs:
           echo "${response}" \
           | jq \
             --raw-output \
-            -r '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' \
+            '.data.repository.pullRequest.closingIssuesReferences.nodes[].number' \
           > issues.lines
 
       - name: Check for exactly one linked issue
@@ -116,7 +116,7 @@ jobs:
           echo "${response}" \
           | jq \
             --raw-output \
-            -r '.data.repository.issue.labels.nodes[].name' \
+            '.data.repository.issue.labels.nodes[].name' \
           > issue-labels.lines
 
       - name: Get PR labels
@@ -134,7 +134,7 @@ jobs:
           echo "${response}" \
           | jq \
             --raw-output \
-            -r '.[].name' \
+            '.[].name' \
           > pr-labels.lines
 
       - name: Check and update PR type label

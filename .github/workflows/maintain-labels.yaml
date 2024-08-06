@@ -33,11 +33,6 @@ jobs:
       - name: Clone repo
         uses: actions/checkout@v4
 
-      - name: Set up GitHub CLI
-        uses: actions/setup-gh@v3
-        with:
-          token: ${{ secrets.github_token }}
-
       - name: Add state awaiting triage to new issues
         if: github.event.action == 'opened' && github.event.issue
         run: |

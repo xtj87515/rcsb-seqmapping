@@ -112,12 +112,3 @@ labels:
   - name: "scope: i18n"
     description: "🌐 Internationalization"
     color: "#009000"
-
-branches:
-  - name: main
-    protection:
-      required_pull_request_reviews:
-        required_approving_review_count: 1
-      enforce_admins: false
-      required_linear_history: true
-      restrictions: null
