@@ -18,6 +18,8 @@ jobs:
 
   commitizen-check:
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
 
     steps:
 
@@ -160,11 +162,11 @@ jobs:
             # Add the issue's type label to PR
             gh api \
               --method POST \
-                repos/${{ github.repository_owner }}\
-                  /${{ github.event.repository.name }}\
-                  /issues/${{ github.event.pull_request.number }}\
-                  /labels \
-                -f labels="${issue_type_label}"
+              repos/${{ github.repository_owner }}\
+                /${{ github.event.repository.name }}\
+                /issues/${{ github.event.pull_request.number }}\
+                /labels \
+              -f labels="${issue_type_label}"
             echo "**❗** Corrected PR type label ${pr_type_label} to ${issue_type_label} from linked issue." \
             >> ${GITHUB_STEP_SUMMARY}
           fi

@@ -15,6 +15,9 @@ on:
 jobs:
   update-metadata:
     runs-on: ubuntu-latest
+    env:
+      SETTINGS_PATH: .github/project.yaml
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Check out the repository
@@ -64,5 +67,3 @@ jobs:
               -f description="${description}" \
               -H "Accept: application/vnd.github+json"
           done
-    env:
-      SETTINGS_PATH: .github/project.yaml

@@ -28,6 +28,9 @@ jobs:
   maintain-labels:
 
     runs-on: ubuntu-latest
+    env:
+      SETTINGS_PATH: .github/project.yaml
+      GH_TOKEN: ${{ github.token }}
 
     steps:
       - name: Clone repo

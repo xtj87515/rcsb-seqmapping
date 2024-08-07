@@ -41,11 +41,10 @@ jobs:
     name: Update coveralls
     needs: test
     strategy:
+      # we can use a matrix to send OS-specific and Python-version-specific coverage data
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
         python:
           - '3.12'
     runs-on: ${{ matrix.os }}
@@ -69,8 +68,6 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
         python:
           - '3.12'
     runs-on: ${{ matrix.os }}
