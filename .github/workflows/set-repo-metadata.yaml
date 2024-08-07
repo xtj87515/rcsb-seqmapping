@@ -56,11 +56,11 @@ jobs:
       - name: Delete existing labels
         run: |
           # Fetch all existing labels using REST API
-          existing_labels=$(gh api /repos/${{ github.repository }}/labels --jq '.[].name')
+          existing_labels=$(gh api "/repos/${{ github.repository }}/labels" --jq '.[].name')
           # Loop over the labels and delete them
           for label in ${existing_labels}; do
             echo "Deleting label: ${label}"
-            gh api --method DELETE /repos/${{ github.repository }}/labels/${label}
+            gh api --method DELETE "/repos/${{ github.repository }}/labels/${label}"
           done
 
       - name: Create new labels
@@ -75,7 +75,7 @@ jobs:
             color=$(echo "${label}" | jq --raw-output '.color' | sed 's/#//')
             # Add the label via the REST API
             echo "Creating label ${name}"
-            gh api --method POST /repos/${{ github.repository }}/labels \
+            gh api --method POST "/repos/${{ github.repository }}/labels" \
               -f name="${name}" \
               -f color="${color}" \
               -f description="${description}" \
