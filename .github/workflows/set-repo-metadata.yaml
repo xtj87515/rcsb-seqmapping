@@ -13,6 +13,9 @@ on:
       - main
       - master
 
+permissions:
+  contents: write
+
 jobs:
   update-metadata:
     runs-on: ubuntu-latest
