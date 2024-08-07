@@ -56,11 +56,17 @@ jobs:
       - name: Delete existing labels
         run: |
           # Fetch all existing labels using REST API
-          existing_labels=$(gh api "/repos/${{ github.repository }}/labels" --jq '.[].name')
+          labels_blob=$(gh api "/repos/${{ github.repository }}/labels" --jq '.[].name')
           # Loop over the labels and delete them
-          for label in ${existing_labels}; do
+          while IFS= read -r label; do
             echo "Deleting label: //${label}//"
-            #gh api --method DELETE "/repos/${{ github.repository }}/labels/${label}"
+            gh api --method DELETE "/repos/${{ github.repository }}/labels/${label}"
+          done <<< "${labels_blob}"
+          labels_blob=$(gh api "/repos/${{ github.repository }}/labels" --jq '.[].name')
+          # Loop over the labels and delete them
+          while IFS= read -r label; do
+            echo "ERROR!! ${label} still exists."
+            exit 1
           done
 
       - name: Create new labels

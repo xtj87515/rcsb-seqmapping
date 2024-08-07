@@ -92,7 +92,6 @@ jobs:
     # This job sends final data to Coveralls to mark the parallel runs as finished.
     # Will not run if the 'send-to-codecov' job was not cancelled
     needs: send-to-codecov
-    continue-on-error: true
     #if: !cancelled()
     runs-on: ubuntu-latest
     steps:
