@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-#
-name: Deploy docs
-run-name: ${{ github.workflow }} for ${{ github.ref_name }}
+
 # Deploys mkdocs documentation to GitHub Pages
 # Mike (https://pypi.org/project/mike/) is used to maintain multiple versions
+
+name: Deploy docs
+run-name: ${{ github.workflow }} for ${{ github.ref_name }}
 
 on:
   push:
@@ -41,10 +42,7 @@ jobs:
       - name: Deploy docs for ${{ github.ref_name }}
         run: |
           hatch run x-deploy-docs ${{ github.ref_name }} --push
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: .
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v4

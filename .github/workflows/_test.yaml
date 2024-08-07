@@ -1,13 +1,13 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-#
-# This workflow is designed to run various types of tests and analyses on the codebase.
-# It is triggered from other workflows using `workflow_call`, with specific ref inputs.
+
+# Runs tests and checks.
+# Triggered from other workflows using `workflow_call`, with specific ref inputs.
 # Different jobs cover tests across multiple operating systems (Ubuntu, Windows, macOS) and Python versions.
 # Some jobs are conditional, triggered only by specific comments on pull requests or specific events,
 # such as '/please-review', '/please-run-tests', '/please-check-docker-build', etc.
-# TODO: Allow tests after failure to run as long as not cancelled
+# TODO: Allow tests after failure to run as long as not cancelled?
 
 name: Test
 run-name: >

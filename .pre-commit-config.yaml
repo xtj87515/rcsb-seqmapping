@@ -19,14 +19,6 @@ repos:
           - '--remove'
       - id: trailing-whitespace
 
-  # --- Commit msg checks ---
-  - hooks:
-      - id: commitizen
-        stages:
-          - 'commit-msg'
-    repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.28.0
-
   # --- Strip output from .ipynb files ---
   - repo: https://github.com/kynan/nbstripout
     rev: 0.7.1
