@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   update-metadata:
@@ -37,21 +38,20 @@ jobs:
       - name: Install yq
         run: sudo snap install yq
 
-      - name: Set repo metadata
-        if: secrets.PAT != ''
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
-        run: |
-          # Read the metadata
-          description=$(yq eval '.description' "${SETTINGS_PATH}")
-          homepage=$(yq eval '.homepage' "${SETTINGS_PATH}")
-          topics=$(yq eval '.topics | join(",")' "${SETTINGS_PATH}")
-          # Update repo
-          gh repo edit "${{ github.repository }}" \
-            --description "${description}" \
-            --homepage "${homepage}" \
-            --add-topic "${topics}"
-          && echo "Updated repo description, homepage, and topics."
+#      - name: Set repo metadata
+#        env:
+#          GH_TOKEN: ${{ secrets.PAT }}
+#        run: |
+#          # Read the metadata
+#          description=$(yq eval '.description' "${SETTINGS_PATH}")
+#          homepage=$(yq eval '.homepage' "${SETTINGS_PATH}")
+#          topics=$(yq eval '.topics | join(",")' "${SETTINGS_PATH}")
+#          # Update repo
+#          gh repo edit "${{ github.repository }}" \
+#            --description "${description}" \
+#            --homepage "${homepage}" \
+#            --add-topic "${topics}"
+#          && echo "Updated repo description, homepage, and topics."
 
       - name: Delete existing labels
         run: |
