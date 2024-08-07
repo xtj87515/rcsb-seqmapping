@@ -8,6 +8,7 @@ on:
   push:
     paths:
       - '.github/project.yaml'
+      - '.github/workflows/set-repo-metadata.yaml'
     branches:
       - main
       - master
