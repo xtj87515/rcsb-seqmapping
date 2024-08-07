@@ -9,8 +9,8 @@ The `\` are added on separate `:tyranno:` lines for visibility.
 <!-- :tyranno: [![Version on GitHub](https://badgen.net/github/release/${.frag}/stable?label=GitHub)](${.link.repo}/releases) -->
 <!-- :tyranno: [![Version on Docker Hub](https://img.shields.io/docker/v/dmyersturnbull/cicd?color=green&label=Docker%20Hub)](https://hub.docker.com/repository/docker/${.frag})
                \ -->
-<!-- :tyranno: [![Build (Actions)](https://img.shields.io/github/workflow/status/${T.name}/${.org}/maintest?label=Tests)](${.link.url}/actions) -->
-<!-- :tyranno: [![Coverage (coveralls)](https://badgen.net/coveralls/c/github/${T.name}/${.name}?label=Coveralls)](https://coveralls.io/github/${.frag}?branch=main) -->
+<!-- :tyranno: [![Build (Actions)](https://img.shields.io/github/workflow/status/${.name}/${.org}/maintest?label=Tests)](${.link.url}/actions) -->
+<!-- :tyranno: [![Coverage (coveralls)](https://badgen.net/coveralls/c/github/${.name}/${.name}?label=Coveralls)](https://coveralls.io/github/${.frag}?branch=main) -->
 <!-- :tyranno: [![Coverage (codecov)](https://badgen.net/codecov/c/github/${.frag}?label=CodeCov)](https://codecov.io/gh/${.frag})
                \ -->
 <!-- :tyranno: [![Maintainability (Code Climate)](https://badgen.net/codeclimate/maintainability/${.frag})](https://codeclimate.com/github/${.frag}/maintainability) -->
