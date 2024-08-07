@@ -1,11 +1,12 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-#
-# This workflow updates the code coverage reports and sends them to Coveralls and Codecov.
+
+# Updates the code coverage reports and sends them to Coveralls and/or Codecov.
+# Coveralls needs secret FAKE_COVERALLS_TOKEN which can be anything non-empty
+# Codecov needs secret CODECOV_TOKEN which Codecov will provide
 # It is triggered by pushes to the main branch and release branches.
-# The workflow runs tests on multiple operating systems (Ubuntu, Windows, macOS) and Python version 3.12,
-# and sends the coverage reports to Coveralls and Codecov.
+# Generates and sends reports for multiple OSes and Python versions.
 
 name: Update coverage
 run-name: ${{ github.workflow }} on ${{ github.ref_name }}
@@ -37,8 +38,11 @@ jobs:
     secrets: inherit
 
   send-to-coveralls:
-    name: Send new reports to coveralls
+    name: Send reports to Coveralls
     needs: test
+    # coverallsapp/github-action just uses github.token
+    # To make Coveralls opt-in, we'll require a FAKE_COVERALLS_TOKEN secret
+    if: FAKE_COVERALLS_TOKEN != ''
     strategy:
       # we can use a matrix to send OS-specific and Python-version-specific coverage data
       matrix:
@@ -48,6 +52,12 @@ jobs:
           - '3.12'
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Determine whether this is the last report.
+        id: last-report
+        shell: bash
+        run: |
+          echo "is_last_report=(( ${{ strategy.job-index }} == ${{ strategy.job-total }} - 1 ))" \
+          >> "${GITHUB_OUTPUT}"
       - name: Download coverage artifact for ${{ matrix.os }} / Python ${{ matrix.python }}
         uses: actions/download-artifact@v4
         with:
@@ -57,10 +67,12 @@ jobs:
         with:
           flag-name: run-${{ matrix.os }}-py${{ matrix.python }}
           parallel: true
+          parallel-finished: ${{ is_last_report }}
 
   send-to-codecov:
-    name: Update coveralls and codecov
+    name: Send reports to codecov
     needs: test
+    if: CODECOV_TOKEN != ''
     continue-on-error: true
     #if: !cancelled()
     strategy:

@@ -2,7 +2,13 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
 #
+# Replaces all issue/PR labels, and sets description, homepage, and topics if a secret called PAT is defined
+# github.token only has read permission for 'metadata'
+# https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication#
 name: Update project settings
+run-name: >
+  ${{ github.workflow }}
+  (run=${{ github.run_id }})
 
 on:
   push:
@@ -21,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SETTINGS_PATH: .github/project.yaml
+      # for historical reasons, the GH CLI uses GH_TOKEN instead of GITHUB_TOKEN
+      # https://github.com/github/docs/issues/21930
       GH_TOKEN: ${{ github.token }}
 
     steps:
@@ -30,7 +38,9 @@ jobs:
         run: sudo snap install yq
 
       - name: Set repo metadata
-        id: set-metadata
+        if: secrets.PAT != ''
+        env:
+          GH_TOKEN: ${{ secrets.PAT }}
         run: |
           # Read the metadata
           description=$(yq eval '.description' "${SETTINGS_PATH}")
@@ -41,6 +51,7 @@ jobs:
             --description "${description}" \
             --homepage "${homepage}" \
             --add-topic "${topics}"
+          && echo "Updated repo description, homepage, and topics."
 
       - name: Delete existing labels
         run: |

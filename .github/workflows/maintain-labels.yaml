@@ -29,7 +29,6 @@ jobs:
 
     runs-on: ubuntu-latest
     env:
-      SETTINGS_PATH: .github/project.yaml
       GH_TOKEN: ${{ github.token }}
 
     steps:

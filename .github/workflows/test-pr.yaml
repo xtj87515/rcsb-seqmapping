@@ -1,12 +1,10 @@
 # SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
-#
-# This workflow runs tests for pull requests and issue comments.
-# It is triggered by pull request events (ready for review, synchronize, edited)
-# and issue comments (created).
-# The tests are conditional based on the state of the pull request (not in draft)
-# and specific events.
+
+# Runs tests for pull requests and issue comments.
+# It is triggered by pull request events (ready for review, synchronize, edited) and issue comments (created).
+# The tests are conditional based on the state of the pull request (not in draft) and specific events.
 
 name: Test PR
 run-name: ${{ github.workflow }} ${{ github.ref_name }}
