@@ -62,6 +62,11 @@ jobs:
             echo "Deleting label: //${label}//"
             gh api --method DELETE "/repos/${{ github.repository }}/labels/${label}"
           done <<< "${labels_blob}"
+
+      - name: Wait for changes to be made
+        shell: bash
+        run: |
+          sleep 15
           labels_blob=$(gh api "/repos/${{ github.repository }}/labels" --jq '.[].name')
           # Loop over the labels and delete them
           while IFS= read -r label; do

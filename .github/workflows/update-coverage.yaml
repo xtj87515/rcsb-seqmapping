@@ -10,7 +10,10 @@
 # Generates and sends reports for multiple OSes and Python versions.
 
 name: Update coverage
-run-name: ${{ github.workflow }} on ${{ github.ref_name }}
+run-name: >
+  ${{ github.workflow }}
+  on ${{ github.ref_name }}
+  (run=${{ github.run_id }})
 
 on:
   push:
