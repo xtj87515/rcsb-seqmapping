@@ -14,13 +14,11 @@ jobs:
     if: github.event.review.state == 'approved'
     runs-on: ubuntu-latest
     steps:
-      - name: Clone the repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
@@ -44,6 +42,7 @@ jobs:
 
       - name: Run pre-commit hooks
         # do not continue on error because we should already be formatted
+        # (from ruff format and prettier steps earlier)
         # we're mostly checking the other things, like that shebangs are executable
         run: |
           pre-commit run --all-files
@@ -55,7 +54,7 @@ jobs:
           git add .
           git commit -m "style: auto-format" || echo "No changes found."
 
-      - name: Push changes
+      - name: Force-push changes
         if: success() && steps.commit.outputs.commit != ''
         run: |
           # --force should be fine here, too

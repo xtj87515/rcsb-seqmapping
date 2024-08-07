@@ -27,7 +27,7 @@ on:
 
 jobs:
   test:
-    name: Run tests for PR and issue comments
+    name: Run tests in response to specific PR actions and issue comments
     # Run tests if the PR is ready for review, synchronized (and not in draft), or edited (and not in draft),
     # or if an issue comment is created
     # or when status checks are requested in a merge group

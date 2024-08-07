@@ -31,14 +31,13 @@ concurrency:
 
 jobs:
 
+  # This job runs the tests and generates coverage reports.
   test:
-    # This job runs the tests and generates coverage reports.
-    name: Run tests
     uses: ./.github/workflows/_test.yaml
     secrets: inherit
 
   send-to-coveralls:
-    name: Update coveralls
+    name: Send new reports to coveralls
     needs: test
     strategy:
       # we can use a matrix to send OS-specific and Python-version-specific coverage data
@@ -53,7 +52,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.python }}
-      - name: Send coverage to Coveralls
+      - name: Send coverage report for "${{ matrix.os }}-${{ matrix.python }}" to Coveralls
         uses: coverallsapp/github-action@v2
         with:
           flag-name: run-${{ matrix.os }}-py${{ matrix.python }}
@@ -72,7 +71,7 @@ jobs:
           - '3.12'
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Send coverage to Codecov
+      - name: Send coverage report for ${{ matrix.os }}-${{ matrix.python }} to Codecov
         uses: codecov/codecov-action@v3
         with:
           env_vars: matrix.os,matrix.python
@@ -86,7 +85,7 @@ jobs:
     #if: !cancelled()
     runs-on: ubuntu-latest
     steps:
-      - name: Send final data to Coveralls
+      - name: Send final data to Coveralls to mark the set completed
         uses: coverallsapp/github-action@v2
         with:
           parallel-finished: true

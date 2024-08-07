@@ -33,8 +33,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
 
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Add state awaiting triage to new issues
         if: github.event.action == 'opened' && github.event.issue

@@ -129,8 +129,7 @@ jobs:
     continue-on-error: true
     runs-on: ubuntu-latest
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
       - name: Run ruff --no-fix
@@ -138,12 +137,9 @@ jobs:
         run:
           pip install hatch~=1.12
           hatch run check
-      - name: Run CodeQL init
-        uses: github/codeql-action/init@v3
-      - name: Run CodeQL autobuild
-        uses: github/codeql-action/autobuild@v3
-      - name: Run CodeQL analyze
-        id: codeql
+      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/autobuild@v3
+      - id: codeql
         uses: github/codeql-action/analyze@v3
       - name: Log Ruff outcome
         run: |
@@ -176,12 +172,10 @@ jobs:
     outputs:
       test_result: ${{ steps.bandit.outcome }}
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Run Bandit security linter
@@ -206,8 +200,7 @@ jobs:
     name: Test building docs
     runs-on: ubuntu-latest
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
       - uses: actions/setup-python@v5
@@ -245,8 +238,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Run linkspector
         id: linkspector
         uses: umbrelladocs/action-linkspector@v1
@@ -270,8 +262,7 @@ jobs:
     name: Quick test on Ubuntu, Python 3.12
     runs-on: ubuntu-latest
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.inputs.ref }}
       - uses: actions/setup-python@v5
