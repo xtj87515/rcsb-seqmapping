@@ -59,8 +59,8 @@ jobs:
           existing_labels=$(gh api "/repos/${{ github.repository }}/labels" --jq '.[].name')
           # Loop over the labels and delete them
           for label in ${existing_labels}; do
-            echo "Deleting label: ${label}"
-            gh api --method DELETE "/repos/${{ github.repository }}/labels/${label}"
+            echo "Deleting label: //${label}//"
+            #gh api --method DELETE "/repos/${{ github.repository }}/labels/${label}"
           done
 
       - name: Create new labels
