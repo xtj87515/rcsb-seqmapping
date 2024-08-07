@@ -67,7 +67,7 @@ jobs:
         with:
           flag-name: run-${{ matrix.os }}-py${{ matrix.python }}
           parallel: true
-          parallel-finished: ${{ is_last_report }}
+          parallel-finished: ${{ env.is_last_report }}
 
   send-to-codecov:
     name: Send reports to codecov
