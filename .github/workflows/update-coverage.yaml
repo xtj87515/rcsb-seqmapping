@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Updates the code coverage reports and sends them to Coveralls and/or Codecov.
-# Coveralls needs secret FAKE_COVERALLS_TOKEN which can be anything non-empty
+# Coveralls can be disabled by setting "if: false"
+# Codecov can be disabled the same way
 # Codecov needs secret CODECOV_TOKEN which Codecov will provide
 # It is triggered by pushes to the main branch and release branches.
 # Generates and sends reports for multiple OSes and Python versions.
@@ -40,9 +41,7 @@ jobs:
   send-to-coveralls:
     name: Send reports to Coveralls
     needs: test
-    # coverallsapp/github-action just uses github.token
-    # To make Coveralls opt-in, we'll require a FAKE_COVERALLS_TOKEN secret
-    if: FAKE_COVERALLS_TOKEN != ''
+    if: true # Change this if you don't want to use Coveralls
     strategy:
       # we can use a matrix to send OS-specific and Python-version-specific coverage data
       matrix:
@@ -72,7 +71,7 @@ jobs:
   send-to-codecov:
     name: Send reports to codecov
     needs: test
-    if: CODECOV_TOKEN != ''
+    if: true
     continue-on-error: true
     #if: !cancelled()
     strategy:
