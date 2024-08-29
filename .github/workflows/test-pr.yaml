@@ -23,6 +23,12 @@ on:
     types:
       - created
 
+permissions:
+  contents: read
+  statuses: write
+  actions: read
+  security-events: write
+
 jobs:
   test:
     name: Run tests in response to specific PR actions and issue comments
