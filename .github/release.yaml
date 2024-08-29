@@ -12,10 +12,10 @@ changelog:
     - title: '💥 Breaking changes'
       labels:
         - 'breaking'
-    - title: '❌ Dropped'
+    - title: '❌ Removals'
       labels:
         - 'type: drop'
-    - title: '🗑️ Deprecation'
+    - title: '🗑️ Deprecations'
       labels:
         - 'type: deprecation'
     - title: '🔒️ Security'
