@@ -25,7 +25,7 @@ jobs:
       - name: Run Ruff format
         # Format Python
         run: |
-          pip install 'ruff >=0.5.5'
+          pip install 'ruff >=0.6.5'
           ruff format .
 
       - name: Run Prettier

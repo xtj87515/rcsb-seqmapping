@@ -65,11 +65,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - uses: astral-sh/setup-uv@v2
       - name: Install dependencies and run tests
         id: test
         run: |
-          pip install hatch~=1.12
+          uv install hatch~=1.12
           hatch run test
+          # OR: uv run pytest
           echo "\
             | Pytest on ${os}, Python ${python} \
             | $( (( $? == 0 )) && echo ✅ || echo ❌ ) \

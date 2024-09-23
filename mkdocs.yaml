@@ -115,6 +115,10 @@ extra_javascript:
 plugins:
   - literate-nav:
       nav_file: SUMMARY.md
+  - macros:
+    render_by_default: false # opt-in, not opt-out
+    on_undefined: strict
+    on_error_fail: true
   - mike:
       alias_type: redirect
       canonical_version: latest
@@ -133,7 +137,7 @@ plugins:
             merge_init_into_class: true
   #- mkdocs-section-index
   - search
-  - table-reader
+  - table-reader # must be defined after 'macros'
 
 extra:
   version:
