@@ -92,6 +92,20 @@ find the highest value allowed by `project.requires-python = ">=3.9.2,<3.14`:
     python-version: '3.12'
 ```
 
+### ✏️ How to start
+
+> [!CAUTION]
+> **🚧** This section needs some work
+
+1. Clone this repo or click "Use this template".
+2. Edit `pyproject.toml` to fit your project, especially the `[project]` and `[tool.tyranno.data]` sections.
+3. Look through the repo structure, and modify, add, or remove anything as you see fit.
+   For example, if you don't use Docker, delete `Dockerfile` and `compose.yaml`.
+4. Add your code under `src/` and `tests/`.
+5. Run `pre-commit install` in your project root.
+6. When committing code, follow the recommended workflow and conventions:
+   1 ticket = 1 branch = 1 PR = 1 squashed commit to master = 1 release notes entry.
+
 ### 🍁 Contributing
 
 [New issues](https://github.com/dmyersturnbull/cicd/issues) and pull requests are welcome.
