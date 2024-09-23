@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Check out https://pre-commit.com/ for documentation
-minimum_pre_commit_version: 3.7.0
+# :tyranno: minimum_pre_commit_version: v${tool.ruff.envs.default~extract_semver(@, "pre-commit")|semver_min(@)}
+minimum_pre_commit_version: 3.8.0
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
@@ -27,7 +28,8 @@ repos:
 
   # --- Linters ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.5.5
+    # :tyranno: rev: v${tool.ruff.envs.default~extract_semver(@, "ruff")|semver_min(@)}
+    rev: v0.6.3
     hooks:
       - id: ruff
         args:
