@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: pip
     directory: /
     commit-message:
-      prefix: "build"
+      prefix: build
     labels:
       - "type: build"
     groups:
@@ -20,7 +20,7 @@ updates:
   - package-ecosystem: github-actions
     directory: .github
     commit-message:
-      prefix: "ci"
+      prefix: ci
     labels:
       - "type: cicd"
     groups:
@@ -32,7 +32,7 @@ updates:
   - package-ecosystem: docker
     directory: /
     commit-message:
-      prefix: "build"
+      prefix: build
     labels:
       - "type: build"
     groups:
@@ -41,10 +41,10 @@ updates:
           - '*'
     schedule:
       interval: weekly
-  - package-ecosystem: "npm"
+  - package-ecosystem: npm
     directory: /
     commit-message:
-      prefix: "build"
+      prefix: build
     labels:
       - "type: build"
     groups:

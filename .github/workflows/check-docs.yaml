@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
+# SPDX-License-Identifier: Apache-2.0
+
+name: check-docs
+run-name: >
+  ${{ github.workflow }} \
+  ${{ github.ref_name }} \
+  (triggered by ${{ github.ref_type }})
+
+on:
+  merge_group:
+    types:
+      - checks_requested
+  pull_request:
+    types:
+      - ready_for_review
+      - synchronize
+      - edited
+    paths:
+      - '**/*.md'
+      - '**/*.py'
+      - 'pyproject.toml'
+      - 'mkdocs.yaml'
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: read
+  statuses: write
+  actions: read
+  security-events: write
+
+jobs:
+
+  check-docs:
+    name: Test building docs
+    runs-on: ubuntu-latest
+    if: >
+      github.even_name == 'merge_group' ||
+      github.event_name == 'pull_request' &&
+        github.event.action == 'ready_for_review' ||
+      github.event_name == 'pull_request' &&
+        github.event.action == 'synchronize' &&
+        github.event.pull_request.draft == false ||
+      github.event_name == 'pull_request' &&
+        github.event.action == 'edited' &&
+        github.event.pull_request.draft == false ||
+      github.event_name == 'issue_comment' &&
+        github.event.action == 'created' && (
+        github.event.comment.body == '/please-review' ||
+        github.event.comment.body == '/please-check-docs'
+      )
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - uses: astral-sh/setup-uv@v2
+      - name: Set up Python
+        run: uv python install '3.12'
+      - name: Install dependencies and build docs
+        run: |
+          uv install hatch~=1.12
+          # Use ⚠️ if there were warnings.
+          mkdocs_output=$( hatch run build-docs 2>&1 )
+          emoji=$(
+            (( $? != 0 ))
+            && echo "❌"
+            || ( echo "${mkdocs_output}" | grep --quiet "^WARNING  " && echo"⚠️" || echo "✅" )
+          )
+          echo "Docs build: ${emoji}"
+          echo "${mkdocs_output}"

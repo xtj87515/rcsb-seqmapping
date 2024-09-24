@@ -18,7 +18,7 @@
 # - Docker Buildx is used for advanced Docker image building and pushing.
 # - Docker metadata action extracts metadata such as tags and labels for the images.
 
-name: Deploy packages
+name: deploy-packages
 run-name: ${{ github.workflow }} for ${{ github.ref_name }}
 
 on:
@@ -55,12 +55,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v2
+      - name: Set up Python
+        run: uv python install '3.12'
       - name: Install Hatch, and build
         run: |
-          pip install hatch~=1.12
+          uv install hatch~=1.12
           hatch build
       - name: Upload dist/ artifacts (wheels and sdists) as GH workflow artifacts
         uses: actions/upload-artifact@v4
@@ -117,9 +117,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
+      - uses: astral-sh/setup-uv@v2
+      - name: Set up Python
+        run: uv python install '3.12'
       - name: Install Hatch
         run: |
-          pip install hatch~=1.12
+          uv install hatch~=1.12
       - name: Publish to PyPi via Hatch
         run: |
           hatch publish

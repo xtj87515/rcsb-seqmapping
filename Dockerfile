@@ -32,11 +32,18 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONHASHSEED=random
 ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV PIP_DEFAULT_TIMEOUT=120
+ENV PATH="/root/.cargo/bin/:$PATH"
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
+
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN sh /uv-installer.sh && rm /uv-installer.sh
 
 WORKDIR /app
 COPY . /app/
 
-RUN pip install .
+#RUN uv install .
+RUN uv sync --frozen
 
 EXPOSE 80
 EXPOSE 443

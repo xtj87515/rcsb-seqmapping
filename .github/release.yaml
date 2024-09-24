@@ -9,34 +9,34 @@ changelog:
       - 'type: style'
       - 'changelog: exclude'
   categories:
-    - title: '💥 Breaking changes'
+    - title: 💥 Breaking changes
       labels:
         - 'breaking'
-    - title: '❌ Removals'
+    - title: ❌ Removals
       labels:
         - 'type: drop'
-    - title: '🗑️ Deprecations'
+    - title: 🗑️ Deprecations
       labels:
         - 'type: deprecation'
-    - title: '🔒️ Security'
+    - title: 🔒️ Security
       labels:
         - 'type: security'
-    - title: '✨ Features'
+    - title: ✨ Features
       labels:
         - 'type: feature'
-    - title: '🐛 Fixes'
+    - title: 🐛 Fixes
       labels:
         - 'type: fix'
-    - title: '⚡️ Performance'
+    - title: ⚡️ Performance
       labels:
         - 'type: performance'
-    - title: '📝 Documentation'
+    - title: 📝 Documentation
       labels:
         - 'type: docs'
     - title: '🔧 Build'
       labels:
         - 'type: build'
-    - title: '🍒 Miscellaneous'
+    - title: 🍒 Miscellaneous
       labels:
         - 'type: refactor'
         - 'type: test'

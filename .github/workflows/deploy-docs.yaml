@@ -5,7 +5,7 @@
 # Deploys mkdocs documentation to GitHub Pages
 # Mike (https://pypi.org/project/mike/) is used to maintain multiple versions
 
-name: Deploy docs
+name: deploy-docs
 run-name: ${{ github.workflow }} for ${{ github.ref_name }}
 
 on:
@@ -33,12 +33,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.ref }}
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v2
+      - name: Set up Python
+        run: uv python install '3.12'
       - name: Install dependencies
         run: |
-          pip install hatch~=1.12
+          uv install hatch~=1.12
       - name: Deploy docs for ${{ github.ref_name }}
         run: |
           hatch run x-deploy-docs ${{ github.ref_name }} --push

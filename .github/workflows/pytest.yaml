@@ -1,0 +1,80 @@
+# SPDX-FileCopyrightText: Copyright 2020-2024, Contributors to Tyrannosaurus
+# SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
+# SPDX-License-Identifier: Apache-2.0
+
+name: pytest
+run-name: >
+  ${{ github.workflow }} \
+  ${{ github.ref_name }} \
+  (triggered by ${{ github.ref_type }})
+
+
+on:
+  merge_group:
+    types:
+      - checks_requested
+  pull_request:
+    types:
+      - ready_for_review
+      - synchronize
+      - edited
+    paths:
+      - '**/*.py'
+      - 'pyproject.toml
+  issue_comment:
+    types:
+      - created
+
+permissions:
+  contents: read
+  statuses: write
+  actions: read
+  security-events: write
+
+jobs:
+
+  pytest:
+    name: Run tests for ${{ matrix.os }}, Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    if: >
+      github.even_name == 'merge_group' ||
+      github.event_name == 'pull_request' &&
+        github.event.action == 'ready_for_review' ||
+      github.event_name == 'pull_request' &&
+        github.event.action == 'synchronize' &&
+        github.event.pull_request.draft == false ||
+      github.event_name == 'pull_request' &&
+        github.event.action == 'edited' &&
+        github.event.pull_request.draft == false ||
+      github.event_name == 'issue_comment' &&
+        github.event.action == 'created' && (
+        github.event.comment.body == '/please-review' ||
+        github.event.comment.body == '/please-test'
+      )
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        python:
+          - '3.12'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - uses: astral-sh/setup-uv@v2
+      - name: Set up Python
+        run: uv python install ${{ matrix.python }}
+      - name: Install dependencies and run tests
+        id: test
+        run: |
+          uv install hatch~=1.12
+          hatch run test
+          echo "Python tests on ${{os}}/${{python}}: $( (( $? == 0 )) && echo ✅ || echo ❌ )"
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.python }}
+          path: coverage.json
+          if-no-files-found: error

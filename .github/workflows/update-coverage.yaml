@@ -9,7 +9,7 @@
 # It is triggered by pushes to the main branch and release branches.
 # Generates and sends reports for multiple OSes and Python versions.
 
-name: Update coverage
+name: update-coverage
 run-name: >
   ${{ github.workflow }}
   on ${{ github.ref_name }}
@@ -21,6 +21,9 @@ on:
       - main
       - master
       - 'releases/**'
+    paths:
+      - '**/*.py'
+      - pyproject.toml
 
 permissions:
   contents: write
@@ -36,14 +39,8 @@ concurrency:
 
 jobs:
 
-  # This job runs the tests and generates coverage reports.
-  test:
-    uses: ./.github/workflows/_test.yaml
-    secrets: inherit
-
   send-to-coveralls:
     name: Send reports to Coveralls
-    needs: test
     if: true # Change this if you don't want to use Coveralls
     strategy:
       # we can use a matrix to send OS-specific and Python-version-specific coverage data

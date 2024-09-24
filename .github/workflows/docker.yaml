@@ -2,12 +2,11 @@
 # SPDX-PackageHomePage: https://github.com/dmyersturnbull/tyrannosaurus
 # SPDX-License-Identifier: Apache-2.0
 
-# Runs tests for pull requests and issue comments.
-# It is triggered by pull request events (ready for review, synchronize, edited) and issue comments (created).
-# The tests are conditional based on the state of the pull request (not in draft) and specific events.
-
-name: Test PR
-run-name: ${{ github.workflow }} ${{ github.ref_name }}
+name: docker
+run-name: >
+  ${{ github.workflow }} \
+  ${{ github.ref_name }} \
+  (triggered by ${{ github.ref_type }})
 
 on:
   merge_group:
@@ -16,9 +15,12 @@ on:
   pull_request:
     types:
       - ready_for_review
-      # could disable these:
       - synchronize
       - edited
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - pyproject.toml
   issue_comment:
     types:
       - created
@@ -30,11 +32,10 @@ permissions:
   security-events: write
 
 jobs:
-  test:
-    name: Run tests in response to specific PR actions and issue comments
-    # Run tests if the PR is ready for review, synchronized (and not in draft), or edited (and not in draft),
-    # or if an issue comment is created
-    # or when status checks are requested in a merge group
+
+  docker:
+    name: Run tests for ${{ matrix.os }}, Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
     if: >
       github.even_name == 'merge_group' ||
       github.event_name == 'pull_request' &&
@@ -46,8 +47,23 @@ jobs:
         github.event.action == 'edited' &&
         github.event.pull_request.draft == false ||
       github.event_name == 'issue_comment' &&
-        github.event.action == 'created'
-    uses: ./.github/workflows/_test.yaml
-    secrets: inherit
-    with:
-      ref: ${{ github.ref }}
+        github.event.action == 'created' && (
+        github.event.comment.body == '/please-review' ||
+        github.event.comment.body == '/please-check-docker'
+      )
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: Build Docker image
+        run: |
+          if [[ -f Dockerfile ]]; then
+            docker build .
+            echo "Docker build on ${{os}}: $( (( $? == 0 )) && echo ✅ || echo ❌ )"
+          fi
