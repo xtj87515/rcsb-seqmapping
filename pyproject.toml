@@ -17,20 +17,20 @@ requires = ["hatchling~=1.25"]
 #########################################################################################
 
 [project]
-name = "cicd"
-version = "0.0.1-alpha0"
+name = "rcsb-seqmapping"
+version = "0.0.1"
 requires-python = "~=3.12"
 # 'readme' |--> 'description' in importlib.metadata
 readme = { file = "README.md", content-type = "text/markdown" }
 # 'description' |--> 'summary' in importlib.metadata
-description = "CI/CD test repo"
+description = "A software library with tools to map and align sequences"
 maintainers = [
-  { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
+  { name = "Tongji Xing", email = " tongji.xing@rcsb.org" }
 ]
 authors = [
-  { name = "Douglas Myers-Turnbull", email = " dmyersturnbull@gmail.com" }
+  { name = "Tongji Xing", email = " tongji.xing@rcsb.org" }
 ]
-keywords = ["python", "ci", "cd"]
+keywords = ["python", "seqmapping"]
 # The Python Packaging Authority has contradictory recommendations for specifying the license:
 # - If the license is well-known, add a Trove classifier and omit `project.license`.
 # - If you do that, tools like pip won't know what the license is.
@@ -380,7 +380,7 @@ pythonpath = "./src" # critical!
 # :tyranno: addopts = """
 # :tyranno:   --cov=src/${project.name}
 addopts = """
-  --cov=src/cicd \
+  --cov=src/rcsb-seqmapping \
   --cov-report json:.coverage.json \
   --cov-report term \
   --cov-config=pyproject.toml \
@@ -417,7 +417,7 @@ data_file = ".coverage.json"
 branch = true # quantify % coverage of execution branches
 parallel = true # note that pytest-cov overrides this
 # :tyranno: source_pkgs = ["src/${project.name}"]
-source_pkgs = ["cicd"]
+source_pkgs = ["rcsb-seqmapping"]
 omit = ["src/**/__main__.py"]
 
 [tool.coverage.paths]
