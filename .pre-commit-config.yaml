@@ -4,7 +4,7 @@
 
 # Check out https://pre-commit.com/ for documentation
 # :tyranno: minimum_pre_commit_version: v${tool.ruff.envs.default~extract_semver(@, "pre-commit")|semver_min(@)}
-minimum_pre_commit_version: 3.8.0
+minimum_pre_commit_version: 3.5.0
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0

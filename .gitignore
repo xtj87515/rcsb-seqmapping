@@ -166,3 +166,9 @@ celerybeat-schedule
 !/.circleci/config.yml
 !/.appveyor.yaml
 !/.appveyor.yml
+
+# User defined
+projects/seqmapping/input
+projects/seqmapping/log
+projects/seqmapping/output
+projects/seqmapping/tmp

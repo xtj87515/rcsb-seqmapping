@@ -19,7 +19,7 @@ requires = ["hatchling~=1.25"]
 [project]
 name = "rcsb-seqmapping"
 version = "0.0.1"
-requires-python = "~=3.12"
+requires-python = "~=3.8"
 # 'readme' |--> 'description' in importlib.metadata
 readme = { file = "README.md", content-type = "text/markdown" }
 # 'description' |--> 'summary' in importlib.metadata
@@ -109,7 +109,7 @@ Download = "https://pypi.org/project/cicd/"
 [tool.hatch.envs.default]
 skip-install = true
 dependencies = [
-  "pre-commit >=3.8",
+  "pre-commit >=3.5",
   "mypy >=1.11",
   "ruff >=0.6.5",
 ]
