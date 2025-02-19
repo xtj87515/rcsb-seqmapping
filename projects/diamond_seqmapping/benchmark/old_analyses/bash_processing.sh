@@ -1,0 +1,2 @@
+# extract the qseqids from rawout_vs_sifts.txt whose second column says "no"- which means either 1) these qseqids do not exist in the SIFTS data, or 2) the diamond search results didn't pick up the hits designated from the SIFTS process (that can indicate it's either a missing hit, or diamond possibly picked up something in the same cluster as the SIFTS hit)
+awk -F'\t' '$2 == "no" { print $1 }' rawout_vs_sifts.txt > not_contained_ids.txt
